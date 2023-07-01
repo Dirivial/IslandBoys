@@ -1,0 +1,9 @@
+/Library
+/Logs
+/Packages
+/Temp
+/UserSettings
+.DS_Store
+*.csproj
+LosIslandLads.sln
+.vscode
