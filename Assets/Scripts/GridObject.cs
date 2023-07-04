@@ -6,6 +6,7 @@ public class GridObject : MonoBehaviour
     public Material terrainMaterial;
     public Material edgeMaterial;
     public GameObject waterPrefab;
+    public GameObject groundPrefab;
     public float waterLevel = .4f;
     public float scale = .1f;
     public int size = 100;
@@ -38,21 +39,22 @@ public class GridObject : MonoBehaviour
                 float noiseValue = noiseMap[x, y];
                 noiseValue -= falloffMap[x, y];
                 if (noiseValue < waterLevel) {
-                    GameObject water = Instantiate(waterPrefab, new Vector3(x, 0, y), Quaternion.identity);
+                    GameObject water = Instantiate(waterPrefab, new Vector3(x * 2, 0, y * 2), Quaternion.identity);
                     water.transform.parent = transform;
                     Cell cell = new Cell(true);
                     grid[x, y] = cell;
                 } else {
+                    GameObject ground = Instantiate(groundPrefab, new Vector3(x * 2, 0, y * 2), Quaternion.identity);
                     Cell cell = new Cell(false);
                     grid[x, y] = cell;
                 }
             }
         }
 
-        DrawTerrainMesh(grid);
-        DrawEdgeMesh(grid);
-        DrawTexture(grid);
-        AddCollission();
+        //DrawTerrainMesh(grid);
+        //DrawEdgeMesh(grid);
+        //DrawTexture(grid);
+        //AddCollission();
     }
 
     void AddCollission() {
