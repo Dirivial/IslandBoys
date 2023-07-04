@@ -163,7 +163,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 2
+  m_Height: 2.7
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &56954362
@@ -243,8 +243,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9ee76637bc974787a4de45ac2b0d2ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
   gridSize: 2
+  jumpHeight: 2
+  jumpDuration: 0.2
+  jumpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1.15615
+      outSlope: 1.15615
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.34827712
+      value: 0.4026606
+      inSlope: 0.16564825
+      outSlope: 0.16564825
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.06893611
+      outWeight: 0.06823399
+    - serializedVersion: 3
+      time: 0.50053155
+      value: 0.00013853895
+      inSlope: -0.01878486
+      outSlope: -0.01878486
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.040901512
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &283241497
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,7 +290,7 @@ GameObject:
   - component: {fileID: 283241499}
   - component: {fileID: 283241498}
   - component: {fileID: 283241500}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Island
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -279,7 +313,7 @@ MonoBehaviour:
   edgeMaterial: {fileID: 2100000, guid: 81204c99a027843c9afdb98ae55e4eb1, type: 2}
   waterPrefab: {fileID: 1432816405483266614, guid: 685ca218a1f341ea09e878964fa75dbb,
     type: 3}
-  groundPrefab: {fileID: 919132149155446097, guid: 07f16d5947491dedbbcd04e7a4f560ce,
+  groundPrefab: {fileID: 8020422876679578357, guid: d1b3357bb257b0268908d5b631720890,
     type: 3}
   waterLevel: 0.2
   scale: 0.2

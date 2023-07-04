@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public float moveSpeed = 5f;
     public float gridSize = 1f;
-    
+    public float jumpHeight = 1f;
+    public float jumpDuration = 1f;
+    public AnimationCurve jumpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+    private float jumpTimer = 0f;
     private Vector3 targetPosition;
     private bool isMoving = false;
     
@@ -14,14 +17,26 @@ public class Movement : MonoBehaviour
     {
         if (isMoving)
         {
-            // Move towards the target position
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
             
+            jumpTimer += Time.deltaTime;
+
+            float normalizedTime = jumpTimer / jumpDuration;
+            float jumpProgress = jumpCurve.Evaluate(normalizedTime);
+
+            // Move towards the target position
+            Vector3 newPosition = Vector3.Lerp(transform.position, targetPosition, jumpProgress);
+            newPosition.y = jumpProgress * jumpHeight + 2f;
+
+            transform.position = newPosition;
+
             // Check if we have reached the target position
-            if (transform.position == targetPosition)
+            if (normalizedTime >= 1f)
             {
                 isMoving = false;
+                jumpTimer = 0f;
+                transform.position = new Vector3(transform.position.x, 2f, transform.position.z);
             }
+
         }
         else
         {
