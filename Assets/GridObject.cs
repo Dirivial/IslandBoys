@@ -188,7 +188,7 @@ public class GridObject : MonoBehaviour
                 if(cell.isWater)
                     colorMap[y * size + x] = Color.blue;
                 else
-                    colorMap[y * size + x] = Color.green;
+                    colorMap[y * size + x] = new Color(153 / 255f, 191 / 255f, 115 / 255f);
             }
         }
         texture.filterMode = FilterMode.Point;

@@ -4,78 +4,58 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    float moveSpeed = 2;
-    float rotationSpeed = 4;
-    float runningSpeed;
-    float vaxis, haxis;
-    public bool isJumping, isJumpingAlt, isGrounded = false;
-    Vector3 movement;
-
-    void Start()
+    public float moveSpeed = 5f;
+    public float gridSize = 1f;
+    
+    private Vector3 targetPosition;
+    private bool isMoving = false;
+    
+    private void Update()
     {
-        Debug.Log("Initialized: (" + this.name + ")");
-    }
-
-
-    void FixedUpdate()
-    {
-        /*  Controller Mappings */
-        vaxis = Input.GetAxis("Vertical");
-        haxis = Input.GetAxis("Horizontal");
-        isJumping = Input.GetButton("Jump");
-        isJumpingAlt = Input.GetKey(KeyCode.Joystick1Button0);
-
-        //Simplified...
-        runningSpeed = vaxis;
-
-
-        if (isGrounded)
+        if (isMoving)
         {
-            movement = new Vector3(0, 0f, runningSpeed * 8);        // Multiplier of 8 seems to work well with Rigidbody Mass of 1.
-            movement = transform.TransformDirection(movement);      // transform correction A.K.A. "Move the way we are facing"
+            // Move towards the target position
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            
+            // Check if we have reached the target position
+            if (transform.position == targetPosition)
+            {
+                isMoving = false;
+            }
         }
         else
         {
-            movement *= 0.70f;                                      // Dampen the movement vector while mid-air
-        }
-
-        GetComponent<Rigidbody>().AddForce(movement * moveSpeed);   // Movement Force
-
-
-        if ((isJumping || isJumpingAlt) && isGrounded)
-        {
-            Debug.Log(this.ToString() + " isJumping = " + isJumping);
-            GetComponent<Rigidbody>().AddForce(Vector3.up * 150);
-        }
-
-
-
-        if ((Input.GetAxis("Vertical") != 0f || Input.GetAxis("Horizontal") != 0f) && !isJumping && isGrounded)
-        {
-            if (Input.GetAxis("Vertical") >= 0)
-                transform.Rotate(new Vector3(0, haxis * rotationSpeed, 0));
-            else
-                transform.Rotate(new Vector3(0, -haxis * rotationSpeed, 0));
-
-        }
-
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("Entered");
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;
+            // Read input for movement
+            float horizontalInput = Input.GetAxisRaw("Horizontal");
+            float verticalInput = Input.GetAxisRaw("Vertical");
+            
+            if (horizontalInput != 0 || verticalInput != 0)
+            {
+                // Calculate the new target position
+                float x = Mathf.Round(transform.position.x / gridSize) * gridSize;
+                float z = Mathf.Round(transform.position.z / gridSize) * gridSize;
+                targetPosition = new Vector3(x + gridSize * horizontalInput, transform.position.y, z + gridSize * verticalInput);
+                
+                // Check if the target position is valid (within bounds of the grid)
+                if (IsPositionValid(targetPosition))
+                {
+                    isMoving = true;
+                }
+            }
         }
     }
-
-    void OnCollisionExit(Collision collision)
+    
+    private bool IsPositionValid(Vector3 position)
     {
-        Debug.Log("Exited");
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = false;
-        }
+        // Implement your own logic here to check if the position is valid
+        // For example, you could check if the position is within the bounds of the grid
+        
+        // Assuming the grid has a size of 10 units in both x and y directions
+        // if (position.x < -5f || position.x > 5f || position.y < -5f || position.y > 5f)
+        // {
+        //     return false;
+        // }
+        
+        return true;
     }
 }
