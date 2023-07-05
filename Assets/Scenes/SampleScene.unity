@@ -243,7 +243,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9ee76637bc974787a4de45ac2b0d2ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: 2
   jumpHeight: 2
   jumpDuration: 0.2
   jumpCurve:
@@ -533,14 +532,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc01e99ea08b35f06a5c2d9b6dfe33a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPosition: {fileID: 56954364}
-  moveSpeed: 10
-  cameraHeight: 30
-  cameraDistance: 20
-  cameraAngle: 50
-  gridSize: 2
-  tiltDifference: 10
-  tiltSpeed: 15
+  playerTransform: {fileID: 56954364}
+  rotationAngleY: 45
+  rotationAngleX: 40
+  moveSpeed: 2
+  cameraOffset: {x: -15, y: 20, z: 15}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

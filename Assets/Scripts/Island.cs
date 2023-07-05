@@ -31,7 +31,7 @@ public class Island : MonoBehaviour
                 if (x > waterBuffer && x < sizeX - waterBuffer && y > waterBuffer && y < sizeY - waterBuffer) {
                     // Calculate the distance from the center for each cell
                     Vector3 cellPosition = new Vector3(x, 0f, y);
-                    float distance = Vector3.Distance(cellPosition, centerPosition) / 15f;
+                    float distance = Vector3.Distance(cellPosition, centerPosition) / 10f;
 
                     // Set the value of the cell based on the distance from the center
                     // You can modify this calculation to suit your needs
@@ -85,7 +85,7 @@ public class Island : MonoBehaviour
             }
         }
 
-        grid = GridManager.Instance;
+        grid = new Cell[sizeX,sizeY];
         for(int y = 0; y < sizeY; y++) {
             for(int x = 0; x < sizeX; x++) {
                 float noiseValue = noiseMap[x, y];

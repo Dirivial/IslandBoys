@@ -4,37 +4,24 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 { 
-    public Transform playerPosition;
+   
+    public Transform playerTransform;
+    public float rotationAngleY = -45f;
+    public float rotationAngleX = 40f;
     public float moveSpeed = 5f;
-    public float cameraHeight = 15f;
-    public float cameraDistance = 5f;
-    public float cameraAngle = 55f;
-    public float gridSize = 2f;
-    public float tiltDifference = 10f;
-    public float tiltSpeed = 15f;
-    public float xOffset = 0f;
 
+    public Vector3 cameraOffset = new Vector3(-15f, 30f, -15f);
 
-    void Start()
+    private void Start()
     {
-        transform.position = new Vector3(playerPosition.position.x, cameraHeight, playerPosition.position.z - cameraDistance);
-        transform.rotation = Quaternion.Euler(cameraAngle, 0, 0);
+        // Calculate the initial camera offset from the player
+        transform.position = playerTransform.position + cameraOffset;
+        transform.rotation = Quaternion.Euler(rotationAngleX, rotationAngleY, 0);
     }
 
     void Update()
     {
-        Vector3 targetPosition = new Vector3(playerPosition.position.x + xOffset, cameraHeight, playerPosition.position.z - cameraDistance);
+        Vector3 targetPosition = new Vector3(playerTransform.position.x + cameraOffset.x, cameraOffset.y + playerTransform.position.y, playerTransform.position.z - cameraOffset.z);
         transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-        // Read input for movement/rotation
-        float lookUpDown = Input.GetAxisRaw("Camera Zoom");
-        float lookLeftRight = Input.GetAxisRaw("Camera Pan");
-
-        tiltCamera(lookUpDown, lookLeftRight);
-    }
-
-    void tiltCamera(float lookUpDown, float lookLeftRight) {
-        Quaternion targetRotation = Quaternion.Euler(cameraAngle - (tiltDifference * lookUpDown), lookLeftRight * tiltDifference - xOffset, 0);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, tiltSpeed * Time.deltaTime);
     }
 }
