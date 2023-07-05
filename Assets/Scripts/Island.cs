@@ -85,7 +85,7 @@ public class Island : MonoBehaviour
             }
         }
 
-        grid = new Cell[sizeX,sizeY];
+        grid = GridManager.Instance;
         for(int y = 0; y < sizeY; y++) {
             for(int x = 0; x < sizeX; x++) {
                 float noiseValue = noiseMap[x, y];

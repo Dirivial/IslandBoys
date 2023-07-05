@@ -6,11 +6,11 @@ public class CameraMovement : MonoBehaviour
 { 
    
     public Transform playerTransform;
-    public float rotationAngleY = -45f;
+    public float rotationAngleY = 45f;
     public float rotationAngleX = 40f;
     public float moveSpeed = 5f;
 
-    public Vector3 cameraOffset = new Vector3(-15f, 30f, -15f);
+    public Vector3 cameraOffset = new Vector3(-15f, 30f, 15f);
 
     private void Start()
     {
