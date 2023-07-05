@@ -8,6 +8,7 @@ public class Movement : MonoBehaviour
     public float jumpHeight = 1f;
     public float jumpDuration = 1f;
     public AnimationCurve jumpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    public GameObject Island;
 
     private float jumpTimer = 0f;
     private Vector3 targetPosition;
@@ -62,15 +63,11 @@ public class Movement : MonoBehaviour
     
     private bool IsPositionValid(Vector3 position)
     {
-        // Implement your own logic here to check if the position is valid
-        // For example, you could check if the position is within the bounds of the grid
-        
-        // Assuming the grid has a size of 10 units in both x and y directions
-        // if (position.x < -5f || position.x > 5f || position.y < -5f || position.y > 5f)
-        // {
-        //     return false;
-        // }
-        
+        Vector3 gridPosition = GridManager.Instance.GetGridPosition(position);
+        if (GridManager.Instance.GetGridCell((int) gridPosition.x, (int) gridPosition.z).isWater)
+        {
+            return false;
+        }
         return true;
     }
 }
