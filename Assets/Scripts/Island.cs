@@ -45,8 +45,6 @@ public class Island : MonoBehaviour
                 float noiseValue = noiseMap[x, y];
                 noiseValue -= falloffMap[x, y];
                 if (noiseValue < waterLevel) {
-                    //GameObject water = Instantiate(waterPrefab, new Vector3(x * 2, 0, y * 2), Quaternion.identity);
-                    //water.transform.parent = transform;
                     grid.SetGridCell(x, y, new Cell(true));
                 } else {
                     GameObject ground = Instantiate(groundPrefab, new Vector3(x * 2, 0, y * 2), Quaternion.identity);
