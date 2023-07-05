@@ -10,11 +10,8 @@ public class CameraMovement : MonoBehaviour
     public float cameraDistance = 5f;
     public float cameraAngle = 55f;
     public float gridSize = 2f;
-    public float tiltDifference = 7f;
+    public float tiltDifference = 10f;
     public float tiltSpeed = 15f;
-
-    private bool lookUp = false;
-    private bool lookDown = false;
 
     void Start()
     {
@@ -28,27 +25,14 @@ public class CameraMovement : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
         // Read input for movement/rotation
-        float zoomInput = Input.GetAxisRaw("Camera Zoom");
+        float lookUpDown = Input.GetAxisRaw("Camera Zoom");
+        float lookLeftRight = Input.GetAxisRaw("Camera Pan");
 
-        if (zoomInput != 0) {
-            lookUp = zoomInput < 0;
-            lookDown = zoomInput > 0;
-        } else {
-            lookUp = false;
-            lookDown = false;
-        }
-
-        tiltCamera();
+        tiltCamera(lookUpDown, lookLeftRight);
     }
 
-    void tiltCamera() {
-        Quaternion targetRotation = Quaternion.Euler(cameraAngle, 0, 0);
-        if (lookUp) {
-            targetRotation = Quaternion.Euler(cameraAngle + tiltDifference, 0, 0);
-        } else if (lookDown) {
-            targetRotation = Quaternion.Euler(cameraAngle - tiltDifference, 0, 0);
-        }
+    void tiltCamera(float lookUpDown, float lookLeftRight) {
+        Quaternion targetRotation = Quaternion.Euler(cameraAngle - (tiltDifference * lookUpDown), lookLeftRight * tiltDifference, 0);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, tiltSpeed * Time.deltaTime);
     }
-
 }
