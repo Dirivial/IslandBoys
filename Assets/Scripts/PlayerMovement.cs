@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public float gridSize = 1f;
+    
     public float jumpHeight = 1f;
     public float jumpDuration = 1f;
     public AnimationCurve jumpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -13,6 +13,13 @@ public class Movement : MonoBehaviour
     private float jumpTimer = 0f;
     private Vector3 targetPosition;
     private bool isMoving = false;
+    private float cellSize = 0f;
+
+    private void Start()
+    {
+        cellSize = GridManager.Instance.cellSize;
+        targetPosition = transform.position;
+    }
     
     private void Update()
     {
@@ -26,7 +33,7 @@ public class Movement : MonoBehaviour
 
             // Move towards the target position
             Vector3 newPosition = Vector3.Lerp(transform.position, targetPosition, jumpProgress);
-            newPosition.y = jumpProgress * jumpHeight + 2f;
+            newPosition.y = jumpProgress * jumpHeight + targetPosition.y;
 
             transform.position = newPosition;
 
@@ -35,7 +42,7 @@ public class Movement : MonoBehaviour
             {
                 isMoving = false;
                 jumpTimer = 0f;
-                transform.position = new Vector3(transform.position.x, 2f, transform.position.z);
+                transform.position = new Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
             }
 
         }
@@ -48,9 +55,10 @@ public class Movement : MonoBehaviour
             if (horizontalInput != 0 || verticalInput != 0)
             {
                 // Calculate the new target position
-                float x = Mathf.Round(transform.position.x / gridSize) * gridSize;
-                float z = Mathf.Round(transform.position.z / gridSize) * gridSize;
-                targetPosition = new Vector3(x + gridSize * horizontalInput, transform.position.y, z + gridSize * verticalInput);
+                float x = Mathf.Round(transform.position.x / cellSize) * cellSize + cellSize * horizontalInput;
+                float z = Mathf.Round(transform.position.z / cellSize) * cellSize + cellSize * verticalInput;
+                Vector3 gridPosition = GridManager.Instance.GetGridPosition(new Vector3(x, 0f, z));
+                targetPosition = new Vector3(x, GridManager.Instance.GetGridCell((int) gridPosition.x, (int) gridPosition.z).height * cellSize + cellSize, z);
                 
                 // Check if the target position is valid (within bounds of the grid)
                 if (IsPositionValid(targetPosition))
