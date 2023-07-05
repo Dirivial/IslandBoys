@@ -45,6 +45,7 @@ public class GridObject : MonoBehaviour
                     grid[x, y] = cell;
                 } else {
                     GameObject ground = Instantiate(groundPrefab, new Vector3(x * 2, 0, y * 2), Quaternion.identity);
+                    ground.transform.parent = transform;
                     Cell cell = new Cell(false);
                     grid[x, y] = cell;
                 }
