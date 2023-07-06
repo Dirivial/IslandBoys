@@ -575,20 +575,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 50, y: 30, z: 50}
   cameraTransform: {fileID: 330585546}
-  moveSpeed: 8
+  moveSpeed: 12
   rotateSpeed: 8
-  groundDrag: 4
+  groundDrag: 8
   playerHeight: 2
   groundMask:
     serializedVersion: 2
     m_Bits: 64
-  jumpForce: 12
+  jumpForce: 18
   jumpCooldown: 0.25
-  airMultiplier: 0.4
-  gravityMultiplier: 2.5
-  gravity: 0
-  readyToJump: 1
-  grounded: 1
+  airMultiplier: 0.2
+  gravityMultiplier: 25
 --- !u!54 &553346481
 Rigidbody:
   m_ObjectHideFlags: 0
