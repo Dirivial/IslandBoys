@@ -586,6 +586,9 @@ MonoBehaviour:
   jumpCooldown: 0.25
   airMultiplier: 0.4
   gravityMultiplier: 2.5
+  gravity: 0
+  readyToJump: 1
+  grounded: 1
 --- !u!54 &553346481
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -608,7 +611,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112
