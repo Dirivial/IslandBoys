@@ -4,78 +4,76 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    
-    public float jumpHeight = 1f;
-    public float jumpDuration = 1f;
-    public AnimationCurve jumpCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-    public GameObject Island;
 
-    private float jumpTimer = 0f;
-    private Vector3 targetPosition;
-    private bool isMoving = false;
-    private float cellSize = 0f;
+    public Vector3 initialPosition = new Vector3(50, 30, 50);
+    public Transform cameraTransform;
+
+    public float moveSpeed = 5f;
+    public float rotateSpeed = 8f;
+
+    public int maxJumps = 2;
+    public float jumpForce = 5f;
+    public float airDragMultiplier = 0.8f;
+
+    private int jumpCount = 0;
+
+    private Rigidbody rb;
 
     private void Start()
     {
-        cellSize = GridManager.Instance.cellSize;
-        targetPosition = transform.position;
+        transform.position = initialPosition;
+        rb = GetComponent<Rigidbody>();
     }
-    
+
     private void Update()
     {
-        if (isMoving)
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float verticalInput = Input.GetAxisRaw("Vertical");
+
+        Vector3 cameraForward = cameraTransform.forward;
+        cameraForward.y = 0f;
+        cameraForward.Normalize();
+
+        Vector3 cameraRight = cameraTransform.right;
+        cameraRight.y = 0f;
+        cameraRight.Normalize();
+
+        Vector3 movementDirection = (cameraForward * verticalInput + cameraRight * horizontalInput).normalized;
+
+        // Rotate the character towards the movement direction
+        if (movementDirection != Vector3.zero)
         {
-            
-            jumpTimer += Time.deltaTime;
-
-            float normalizedTime = jumpTimer / jumpDuration;
-            float jumpProgress = jumpCurve.Evaluate(normalizedTime);
-
-            // Move towards the target position
-            Vector3 newPosition = Vector3.Lerp(transform.position, targetPosition, jumpProgress);
-            newPosition.y = jumpProgress * jumpHeight + targetPosition.y;
-
-            transform.position = newPosition;
-
-            // Check if we have reached the target position
-            if (normalizedTime >= 1f)
-            {
-                isMoving = false;
-                jumpTimer = 0f;
-                transform.position = new Vector3(targetPosition.x, targetPosition.y, targetPosition.z);
-            }
-
+            Quaternion toRotation = Quaternion.LookRotation(movementDirection);
+            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, rotateSpeed * Time.fixedDeltaTime);
         }
-        else
+
+        Vector3 movement = movementDirection * moveSpeed * Time.fixedDeltaTime;
+        transform.position += movement;
+
+        // Jumping
+        if (IsGrounded())
         {
-            // Read input for movement
-            float horizontalInput = Input.GetAxisRaw("Horizontal");
-            float verticalInput = Input.GetAxisRaw("Vertical");
-            
-            if (horizontalInput != 0 || verticalInput != 0)
-            {
-                // Calculate the new target position
-                float x = Mathf.Round(transform.position.x / cellSize) * cellSize + cellSize * horizontalInput;
-                float z = Mathf.Round(transform.position.z / cellSize) * cellSize + cellSize * verticalInput;
-                Vector3 gridPosition = GridManager.Instance.GetGridPosition(new Vector3(x, 0f, z));
-                targetPosition = new Vector3(x, GridManager.Instance.GetGridCell((int) gridPosition.x, (int) gridPosition.z).height * cellSize + cellSize, z);
-                
-                // Check if the target position is valid (within bounds of the grid)
-                if (IsPositionValid(targetPosition))
-                {
-                    isMoving = true;
-                }
-            }
+            jumpCount = 0;
+        }
+
+        if (Input.GetButtonDown("Jump") && (jumpCount < maxJumps - 1))
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            jumpCount++;
         }
     }
-    
-    private bool IsPositionValid(Vector3 position)
+
+    private bool IsGrounded()
     {
-        Vector3 gridPosition = GridManager.Instance.GetGridPosition(position);
-        if (GridManager.Instance.GetGridCell((int) gridPosition.x, (int) gridPosition.z).isWater)
+        // Check if the player is grounded
+        // You can use a sphere or capsule cast here if you want to
+        // I'm using a raycast for simplicity
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.1f))
         {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
+
 }
