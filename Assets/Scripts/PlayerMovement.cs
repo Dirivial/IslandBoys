@@ -21,14 +21,14 @@ public class Movement : MonoBehaviour
     public float jumpForce = 12f;
     public float jumpCooldown = 0.25f;
     public float airMultiplier = 0.4f;
+    public float gravityMultiplier = 2.5f;
 
     private bool readyToJump = true;
     private Rigidbody rb;
     private bool grounded = true;
 
-    // private int jumpCount = 0;
-    // private float movementMultiplier = 1f;
-    // private bool isJumping = false;
+    private Animator animator;
+    private int isWalkingHash;
 
     private float horizontalInput = 0f;
     private float verticalInput = 0f;
@@ -36,16 +36,19 @@ public class Movement : MonoBehaviour
     private Vector3 cameraForward = Vector3.zero;
     private Vector3 cameraRight = Vector3.zero;
 
-    private void Start()
-    {
+    private void Awake() {
+        animator = GetComponent<Animator>();
         transform.position = initialPosition;
         rb = GetComponent<Rigidbody>();
+        isWalkingHash = Animator.StringToHash("isWalking");
     }
 
     private void Update()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+
+        handleAnimation();
 
         if (Input.GetKeyDown("space") && grounded && readyToJump) {
             
@@ -54,6 +57,7 @@ public class Movement : MonoBehaviour
             Jump();
 
             Invoke("ResetJump", jumpCooldown);
+            
         }
 
         cameraForward = cameraTransform.forward;
@@ -97,6 +101,7 @@ public class Movement : MonoBehaviour
         } else {
             // If the player is in the air apply the movement with airMultiplier
             rb.AddForce(movement * airMultiplier, ForceMode.Force);
+            rb.AddForce(Vector3.down * gravityMultiplier, ForceMode.Force);
         }
         
     }
@@ -118,5 +123,19 @@ public class Movement : MonoBehaviour
 
     private void ResetJump() {
         readyToJump = true;
+    }
+
+    private void handleAnimation() {
+        bool isWalking = animator.GetBool(isWalkingHash);
+
+        if (horizontalInput != 0f || verticalInput != 0f) {
+            if (!isWalking) {
+                animator.SetBool(isWalkingHash, true);
+            }
+        } else {
+            if (isWalking) {
+                animator.SetBool(isWalkingHash, false);
+            }
+        }
     }
 }
