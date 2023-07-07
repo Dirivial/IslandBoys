@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 public class Island : MonoBehaviour
 {
-    public Material terrainMaterial;
-    public Material edgeMaterial;
     public GameObject groundPrefab;
     public GameObject edgePrefab;
     public AnimationCurve heightCurveX;
     public AnimationCurve heightCurveY;
     public float waterLevel = .4f;
+
+    public float cellSize = 1f;
 
     public int sizeX = 100;
     public int sizeY = 100;
@@ -23,7 +23,7 @@ public class Island : MonoBehaviour
             for(int x = 0; x < sizeX; x++) {
                 Cell cell = grid[x, y];
                 if (!cell.isWater) {
-                    GameObject ground = Instantiate(groundPrefab, new Vector3(x * 2, cell.height * 2, y * 2), Quaternion.identity);
+                    GameObject ground = Instantiate(groundPrefab, new Vector3(x * cellSize, cell.height * cellSize, y * cellSize), Quaternion.identity);
                     ground.transform.parent = transform;
                 } else {
                     // Check if a cell is an edge cell
@@ -41,7 +41,7 @@ public class Island : MonoBehaviour
     }
 
     private void SpawnEdgeCell(int x, int y) {
-        GameObject edge = Instantiate(edgePrefab, new Vector3(x * 2, 25f, y * 2), Quaternion.identity);
+        GameObject edge = Instantiate(edgePrefab, new Vector3(x * cellSize, 25f, y * cellSize), Quaternion.identity);
         edge.transform.parent = transform;
     }
 }
