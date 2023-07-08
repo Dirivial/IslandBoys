@@ -173,7 +173,7 @@ namespace StarterAssets
       if (isOnBoat)
       {
         MoveOnBoat();
-        transform.position = new Vector3(transform.position.x, .45f, transform.position.z);
+        transform.position = new Vector3(transform.position.x, .2f, transform.position.z);
       }
       else
       {

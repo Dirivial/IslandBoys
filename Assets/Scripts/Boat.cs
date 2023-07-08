@@ -13,7 +13,7 @@ public class Boat : MonoBehaviour
   {
     if (isSpawned)
     {
-      transform.position = new Vector3(playerTransform.position.x, 0.2f, playerTransform.position.z);
+      transform.position = new Vector3(playerTransform.position.x, 0f, playerTransform.position.z);
       transform.rotation = playerTransform.rotation;
     }
   }
