@@ -1,37 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class Boat : MonoBehaviour
 {
+
   public Transform playerTransform;
 
-  [Header("Player")]
-  [Tooltip("Move speed of the boat in m/s")]
-  public float MoveSpeed = 8.0f;
+  private bool isSpawned = false;
 
-  [Tooltip("How fast the character turns to face movement direction")]
-  [Range(0.0f, 1.2f)]
-  public float RotationSmoothTime = 0.4f;
-
-  [Tooltip("Acceleration and deceleration")]
-  public float SpeedChangeRate = 10.0f;
-
-  public AudioClip BoatingAudioClip;
-
-  // Update is called once per frame
+  //   Update is called once per frame
   void Update()
   {
-
+    if (isSpawned)
+    {
+      transform.position = new Vector3(playerTransform.position.x, 0.2f, playerTransform.position.z);
+      transform.rotation = playerTransform.rotation;
+    }
   }
 
-  public void Spawn()
-  {
-    transform.position = new Vector3(playerTransform.position.x, 0, playerTransform.position.z);
-  }
+  public void Spawn() { isSpawned = true; }
+  public void DeSpawn() { isSpawned = false; }
 
-  public void DeSpawn()
-  {
-    transform.position = new Vector3(0, -100, 0);
-  }
 }
+
+

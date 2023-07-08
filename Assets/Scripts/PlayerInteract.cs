@@ -6,16 +6,20 @@ public class PlayerInteract : MonoBehaviour
 {
 
   public float interactDistance = 3f;
-
-  private bool stoppedController = false;
+  public GameObject boatObject;
+  //   private bool stoppedController = false;
   private Transform playerTransform;
 
+  private bool isOnBoat = false;
+
   private StarterAssets.ThirdPersonController playerController;
+  private Boat boat;
 
   void Start()
   {
     playerTransform = GetComponent<Transform>();
     playerController = GetComponent<StarterAssets.ThirdPersonController>();
+    boat = boatObject.GetComponent<Boat>();
   }
 
   // Update is called once per frame
@@ -23,24 +27,28 @@ public class PlayerInteract : MonoBehaviour
   {
     if (Input.GetKeyDown(KeyCode.E))
     {
-      Collider[] hitColliders = Physics.OverlapSphere(transform.position, interactDistance);
-
-      foreach (Collider hitCollider in hitColliders)
+      if (isOnBoat)
       {
-        if (playerTransform.position.y < 0 && hitCollider.gameObject.tag == "Sea")
+        isOnBoat = false;
+        playerController.ToggleOnBoat();
+        boat.DeSpawn();
+      }
+      else
+      {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, interactDistance);
+
+        foreach (Collider hitCollider in hitColliders)
         {
-          //   hitCollider.gameObject.GetComponent<Interactable>().Interact();
-          if (stoppedController)
+          if (playerTransform.position.y < 0 && hitCollider.gameObject.tag == "Sea")
           {
-            GetComponent<StarterAssets.ThirdPersonController>().enabled = true;
-            stoppedController = false;
-            break;
-          }
-          else
-          {
-            GetComponent<StarterAssets.ThirdPersonController>().enabled = false;
-            stoppedController = true;
-            break;
+            //   hitCollider.gameObject.GetComponent<Interactable>().Interact();
+            if (!isOnBoat)
+            {
+              playerController.ToggleOnBoat();
+              isOnBoat = true;
+              boat.Spawn();
+              break;
+            }
           }
         }
       }

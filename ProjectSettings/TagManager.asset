@@ -8,6 +8,7 @@ TagManager:
   - Ground
   - CinemachineTarget
   - Sea
+  - Boat
   layers:
   - Default
   - TransparentFX
