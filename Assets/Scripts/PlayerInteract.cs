@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerInteract : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class PlayerInteract : MonoBehaviour
   public GameObject boatObject;
   //   private bool stoppedController = false;
   private Transform playerTransform;
+
 
   private bool isOnBoat = false;
 
@@ -20,11 +23,22 @@ public class PlayerInteract : MonoBehaviour
     playerTransform = GetComponent<Transform>();
     playerController = GetComponent<StarterAssets.ThirdPersonController>();
     boat = boatObject.GetComponent<Boat>();
+    if (playerController.isOnBoat)
+    {
+      isOnBoat = true;
+      boat.Spawn();
+    }
   }
 
   // Update is called once per frame
   void Update()
   {
+    if (isOnBoat && Input.GetKeyDown(KeyCode.F))
+    {
+      Debug.Log("Player wants to leave island");
+
+      SceneManager.LoadScene("Exploration");
+    }
     if (Input.GetKeyDown(KeyCode.E))
     {
       if (isOnBoat)

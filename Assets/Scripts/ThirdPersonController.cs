@@ -86,6 +86,9 @@ namespace StarterAssets
     [Tooltip("Acceleration and deceleration")]
     public float BoatSpeedChangeRate = 5.0f;
 
+    [Tooltip("Set if the player is on the boat")]
+    public bool isOnBoat = false;
+
     // cinemachine
     private float _cinemachineTargetYaw;
     private float _cinemachineTargetPitch;
@@ -97,9 +100,6 @@ namespace StarterAssets
     private float _rotationVelocity;
     private float _verticalVelocity;
     private float _terminalVelocity = 53.0f;
-
-    // Boat
-    private bool isOnBoat = false;
 
     // timeout deltatime
     private float _jumpTimeoutDelta;
