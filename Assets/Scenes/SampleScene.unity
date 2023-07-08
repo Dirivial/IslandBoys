@@ -203,39 +203,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3ad613ab914446e874692b010fda7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundPrefab: {fileID: 2949211645998804738, guid: 88e8f85d44f3be84db4dbdfd0b95c7cc,
-    type: 3}
+  prefabHeights:
+  - prefab: {fileID: 8626509336552461570, guid: 2ed10d852e0122a4e99355b8b9c5d36a,
+      type: 3}
+    height: -2
+  - prefab: {fileID: 1997339237370494244, guid: 085d225f23186674a85df6b8e1889316,
+      type: 3}
+    height: 0.5
+  - prefab: {fileID: 3203802623825764563, guid: f263fba9feea7684eb5852e2cc8d4d00,
+      type: 3}
+    height: 2
+  - prefab: {fileID: 1443107715739563685, guid: 0966eff78248c3f44ab995a90d54768b,
+      type: 3}
+    height: 4
   edgePrefab: {fileID: 2580124199819548317, guid: 2656e0766c2602c4f9e99c489dc15572,
     type: 3}
   heightCurveX:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: -0.2961137
-      outSlope: -0.2961137
+      time: 0.009377177
+      value: -0.12155117
+      inSlope: -0.18580028
+      outSlope: -0.18580028
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.09415713
+      outWeight: 0.09259326
     - serializedVersion: 3
-      time: 0.4993008
-      value: 0.49930078
-      inSlope: 0.001639396
-      outSlope: 0.001639396
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0.0002433341
-      inSlope: 0.37646517
-      outSlope: 0.37646517
+      time: 0.5394575
+      value: 0.17447478
+      inSlope: -1.6696553
+      outSlope: -1.6696553
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.09976254
+      inWeight: 0.33333334
+      outWeight: 0.0218134
+    - serializedVersion: 3
+      time: 0.9962697
+      value: -0.115600795
+      inSlope: -0.24842614
+      outSlope: -0.24842614
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.12436644
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -244,8 +255,50 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.000979432
-      value: 0.013921115
+      time: 0.0021199854
+      value: -0.08887473
+      inSlope: 0.43072048
+      outSlope: 0.43072048
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.04317896
+    - serializedVersion: 3
+      time: 0.3533169
+      value: 0.08189157
+      inSlope: 1.6743313
+      outSlope: 1.6743313
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.118753284
+      outWeight: 0.056959562
+    - serializedVersion: 3
+      time: 0.62422323
+      value: 0.16202858
+      inSlope: -2.0078108
+      outSlope: -2.0078108
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1423359
+      outWeight: 0.08965121
+    - serializedVersion: 3
+      time: 0.9920424
+      value: -0.0645158
+      inSlope: -0.9541426
+      outSlope: -0.9541426
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.07093619
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  dropOffCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -253,36 +306,28 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.64446145
-      value: 0.29654643
-      inSlope: 1.565779
-      outSlope: 1.565779
+      time: 0.74657357
+      value: 0.24134697
+      inSlope: 0.9409201
+      outSlope: 0.9409201
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 1
-    - serializedVersion: 3
-      time: 0.6454497
-      value: 0.29655543
-      inSlope: 0.006982999
-      outSlope: 0.006982999
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      outWeight: 0.14120094
     - serializedVersion: 3
       time: 1
-      value: -0.004640341
-      inSlope: 0.21755904
-      outSlope: 0.21755904
+      value: 1
+      inSlope: 3.1585443
+      outSlope: 3.1585443
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.27072236
+      inWeight: 0.026444674
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  waterLevel: 0.14
+  waterLevel: -0.45
+  heightMultiplier: 15
   cellSize: 1
   sizeX: 100
   sizeY: 100
@@ -447,7 +492,7 @@ MonoBehaviour:
   m_TargetMovementOnly: 1
   m_ScreenX: 0.5
   m_ScreenY: 0.5
-  m_CameraDistance: 10
+  m_CameraDistance: 18
   m_DeadZoneWidth: 0
   m_DeadZoneHeight: 0
   m_DeadZoneDepth: 0
@@ -489,7 +534,7 @@ PrefabInstance:
     - target: {fileID: 8944336655422409496, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
       propertyPath: orthographic
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409496, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
@@ -514,17 +559,17 @@ PrefabInstance:
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 44.58325
+      value: 40.249847
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 38.427876
+      value: 43.57018
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 44.583256
+      value: 40.24985
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f,
         type: 3}
@@ -715,17 +760,17 @@ PrefabInstance:
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 44.58325
+      value: 40.249847
       objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 38.427876
+      value: 43.57018
       objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 44.583256
+      value: 40.24985
       objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8,
         type: 3}

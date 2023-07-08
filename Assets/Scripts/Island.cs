@@ -1,47 +1,62 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
+
+[Serializable]
+public struct PrefabToHeight
+{
+  public GameObject prefab;
+  public float height;
+}
 
 public class Island : MonoBehaviour
 {
-    public GameObject groundPrefab;
-    public GameObject edgePrefab;
-    public AnimationCurve heightCurveX;
-    public AnimationCurve heightCurveY;
-    public float waterLevel = .4f;
 
-    public float cellSize = 1f;
+  public List<PrefabToHeight> prefabHeights;
+  public GameObject edgePrefab;
+  public AnimationCurve heightCurveX;
+  public AnimationCurve heightCurveY;
+  public AnimationCurve dropOffCurve;
+  public float waterLevel = .4f;
+  public float heightMultiplier = 5f;
 
-    public int sizeX = 100;
-    public int sizeY = 100;
-    private Cell[,] grid;
+  public float cellSize = 1f;
 
-    private void Start() {
+  public int sizeX = 100;
+  public int sizeY = 100;
+  private Cell[,] grid;
 
-        grid = IslandGenerator.GenerateIslandFromAnimationCurve(sizeX, sizeY, heightCurveX, heightCurveY, waterLevel);
+  private void Start()
+  {
 
-        for (int y = 0; y < sizeY; y++) {
-            for(int x = 0; x < sizeX; x++) {
-                Cell cell = grid[x, y];
-                if (!cell.isWater) {
-                    GameObject ground = Instantiate(groundPrefab, new Vector3(x * cellSize, cell.height * cellSize, y * cellSize), Quaternion.identity);
-                    ground.transform.parent = transform;
-                } else {
-                    // Check if a cell is an edge cell
-                    for (int i = -1; i < 2; i+= 2) {
-                        if (x + i > 0 && x + i < sizeX && y + i > 0 && y + i < sizeY) {
-                            if (!grid[x + i,y].isWater || !grid[x,y+i].isWater) {
-                                SpawnEdgeCell(x, y);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+    grid = IslandGenerator.GenerateIslandFromAnimationCurve(sizeX, sizeY, heightCurveX, heightCurveY, dropOffCurve, waterLevel, heightMultiplier);
+
+    for (int y = 0; y < sizeY; y++)
+    {
+      for (int x = 0; x < sizeX; x++)
+      {
+        Cell cell = grid[x, y];
+        for (int i = prefabHeights.Count - 1; i >= 0; i--)
+        {
+          if (cell.height >= prefabHeights[i].height)
+          {
+            GameObject prefab = prefabHeights[i].prefab;
+            GameObject go = Instantiate(prefab, new Vector3(x * cellSize, cell.height * cellSize, y * cellSize), Quaternion.identity);
+            go.transform.parent = transform;
+            break;
+          }
         }
+        if (x == 0 || x == sizeX - 1 || y == 0 || y == sizeY - 1)
+        {
+          SpawnEdgeCell(x, y);
+        }
+      }
     }
+  }
 
-    private void SpawnEdgeCell(int x, int y) {
-        GameObject edge = Instantiate(edgePrefab, new Vector3(x * cellSize, 25f, y * cellSize), Quaternion.identity);
-        edge.transform.parent = transform;
-    }
+  private void SpawnEdgeCell(int x, int y)
+  {
+    GameObject edge = Instantiate(edgePrefab, new Vector3(x * cellSize, 25f, y * cellSize), Quaternion.identity);
+    edge.transform.parent = transform;
+  }
 }
