@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Water
   - Ground
+  - CinemachineTarget
+  - Sea
+  - Boat
   layers:
   - Default
   - TransparentFX
@@ -13,8 +16,8 @@ TagManager:
   - 
   - Water
   - UI
+  - Sea
   - Ground
-  - 
   - 
   - 
   - 
