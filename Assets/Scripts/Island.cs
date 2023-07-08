@@ -13,9 +13,9 @@ public class Island : MonoBehaviour
 {
 
   public List<PrefabToHeight> prefabHeights;
+
+  public List<AnimationCurve> heightCurves;
   public GameObject edgePrefab;
-  public AnimationCurve heightCurveX;
-  public AnimationCurve heightCurveY;
   public AnimationCurve dropOffCurve;
   public float waterLevel = .4f;
   public float heightMultiplier = 5f;
@@ -28,6 +28,16 @@ public class Island : MonoBehaviour
 
   private void Start()
   {
+
+    if (heightCurves.Count < 2)
+    {
+      Debug.LogError("You need at least 2 height curves");
+    }
+
+    int index = UnityEngine.Random.Range(1, heightCurves.Count);
+
+    AnimationCurve heightCurveX = heightCurves[index];
+    AnimationCurve heightCurveY = heightCurves[index - 1];
 
     grid = IslandGenerator.GenerateIslandFromAnimationCurve(sizeX, sizeY, heightCurveX, heightCurveY, dropOffCurve, waterLevel, heightMultiplier);
 
