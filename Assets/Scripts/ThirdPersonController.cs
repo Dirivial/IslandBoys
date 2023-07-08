@@ -89,6 +89,11 @@ namespace StarterAssets
     [Tooltip("Set if the player is on the boat")]
     public bool isOnBoat = false;
 
+    [Tooltip("Sound played when moving around with the boat")]
+    public AudioClip boatSounds;
+
+    private AudioSource audioSource;
+
     // cinemachine
     private float _cinemachineTargetYaw;
     private float _cinemachineTargetPitch;
@@ -164,6 +169,12 @@ namespace StarterAssets
       // reset our timeouts on start
       _jumpTimeoutDelta = JumpTimeout;
       _fallTimeoutDelta = FallTimeout;
+
+      // Instantiate audio source
+      audioSource = gameObject.AddComponent<AudioSource>();
+      audioSource.loop = true;
+      audioSource.clip = boatSounds;
+      audioSource.volume = FootstepAudioVolume / 2f;
     }
 
     private void Update()
@@ -459,7 +470,6 @@ namespace StarterAssets
           new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
           GroundedRadius);
     }
-
     private void OnFootstep(AnimationEvent animationEvent)
     {
       if (animationEvent.animatorClipInfo.weight > 0.5f)
@@ -487,6 +497,16 @@ namespace StarterAssets
       {
         _animator.SetFloat(_animIDSpeed, 0);
         _animator.SetFloat(_animIDMotionSpeed, 0);
+      }
+
+      // Play sound
+      if (!audioSource.isPlaying)
+      {
+        audioSource.Play();
+      }
+      else
+      {
+        audioSource.Stop();
       }
     }
   }
