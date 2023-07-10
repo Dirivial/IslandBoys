@@ -14,4 +14,5 @@ public class Cell
     this.isWater = isWater;
     this.height = height;
   }
+
 }
