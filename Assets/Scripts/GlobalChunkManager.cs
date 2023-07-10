@@ -40,10 +40,14 @@ public class GlobalChunkManager : MonoBehaviour
     private Vector2Int currentPlayerChunk;
     // private ChunkManager chunkManager;
 
+    void Awake()
+    {
+        chunks = new Dictionary<Vector2Int, ChunkObject>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        chunks = new Dictionary<Vector2Int, ChunkObject>();
         regionGenerator = GetComponent<RegionGeneratorWFC>();
         // chunkManager = GetComponent<ChunkManager>();
     }
@@ -68,9 +72,9 @@ public class GlobalChunkManager : MonoBehaviour
     void UpdateChunks()
     {
         // Loop through the chunks surrounding the player and load/unload as needed
-        for (int x = currentPlayerChunk.x - 1; x <= currentPlayerChunk.x + 1; x++)
+        for (int x = currentPlayerChunk.x - 2; x <= currentPlayerChunk.x + 2; x++)
         {
-            for (int y = currentPlayerChunk.y - 1; y <= currentPlayerChunk.y + 1; y++)
+            for (int y = currentPlayerChunk.y - 2; y <= currentPlayerChunk.y + 2; y++)
             {
                 Vector2Int chunkPos = new Vector2Int(x, y);
 
@@ -97,7 +101,7 @@ public class GlobalChunkManager : MonoBehaviour
         List<Vector2Int> chunksToRemove = new List<Vector2Int>();
         foreach (var chunk in chunks)
         {
-            if (Vector2Int.Distance(chunk.Key, currentPlayerChunk) > 1.5f)
+            if (Vector2Int.Distance(chunk.Key, currentPlayerChunk) > 3.5f)
             {
                 chunksToRemove.Add(chunk.Key);
             }

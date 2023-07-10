@@ -19,7 +19,7 @@ public struct Region
 }
 
 [System.Serializable]
-public struct RegionPair
+public struct RegionAdjacency
 {
     public ChunkType regionA;
     public ChunkType regionB;
@@ -35,7 +35,7 @@ public class RegionGeneratorWFC : MonoBehaviour
 {
 
     [SerializeField] private List<Region> regions;
-    [SerializeField] private List<RegionPair> validNeighbors;
+    [SerializeField] private List<RegionAdjacency> adjacancies;
 
     private Dictionary<ChunkType, HashSet<ChunkType>> chunkTypePairs;
 
@@ -44,7 +44,7 @@ public class RegionGeneratorWFC : MonoBehaviour
     void Start()
     {
         chunkTypePairs = new Dictionary<ChunkType, HashSet<ChunkType>>();
-        foreach (var pair in validNeighbors)
+        foreach (var pair in adjacancies)
         {
             if (!chunkTypePairs.ContainsKey(pair.regionA))
             {
@@ -72,23 +72,34 @@ public class RegionGeneratorWFC : MonoBehaviour
     public ChunkType DecideRegion(List<Neighbor> neighbours)
     {
         HashSet<ChunkType> validRegionSet = new HashSet<ChunkType>();
-        foreach (var neighbour in neighbours)
+
+        if (neighbours.Count == 0) 
+        { 
+            Debug.Log("0 Neighbours"); 
+            return ChunkType.Sea;
+        } 
+        else 
         {
-            if (chunkTypePairs.ContainsKey(neighbour.chunkType))
+            // Add all valid regions from first neighbour
+            foreach (ChunkType type in chunkTypePairs[neighbours[0].chunkType])
             {
-                foreach (var type in chunkTypePairs[neighbour.chunkType])
+                validRegionSet.Add(type);
+            }
+
+            if (neighbours.Count > 1)
+            {
+                // Remove regions that are not valid for all neighbours
+                for (int i = 1; i < neighbours.Count; i++)
                 {
-                    validRegionSet.Add(type);
+                    HashSet<ChunkType> neighbour = new HashSet<ChunkType>(chunkTypePairs[neighbours[1].chunkType]);
+                    validRegionSet.IntersectWith(neighbour);
                 }
             }
         }
+
         List<ChunkType> validRegions = new List<ChunkType>(validRegionSet);
         List<int> probabilities = new List<int>();
-        // for (int i = 0; i < validRegions.Count; i++)
-        // {
-        //     Debug.Log(validRegions[i].ToString());
-        // }
-        // Debug.Log("-----------------");
+
         int probabilitySum = 0;
         foreach (var region in regions)
         {
@@ -109,7 +120,8 @@ public class RegionGeneratorWFC : MonoBehaviour
                 return validRegions[i];
             }
         }
-        Debug.Log("Defaulting to sea");
+
+        Debug.Log("Defaulting to sea " + remaining);
         return ChunkType.Sea;
     }
 }
