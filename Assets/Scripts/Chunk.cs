@@ -12,7 +12,7 @@ public class Chunk : MonoBehaviour
 
     public void SetChunk(int x, int z, int size, ChunkType type)
     {
-        Debug.Log(x + ", " + z + ", " + size + ", " + type);
+        //Debug.Log(x + ", " + z + ", " + size + ", " + type);
         this.type = type;
         this.x = x;
         this.z = z;

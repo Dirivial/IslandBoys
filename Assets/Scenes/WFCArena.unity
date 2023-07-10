@@ -160,6 +160,8 @@ MonoBehaviour:
     chunkType: 0
   - block: {fileID: 1997339237370494244, guid: 085d225f23186674a85df6b8e1889316, type: 3}
     chunkType: 1
+  - block: {fileID: 8626509336552461570, guid: 2ed10d852e0122a4e99355b8b9c5d36a, type: 3}
+    chunkType: 2
   chunkPrefab: {fileID: 6417811292781886953, guid: 1d121619a8866d348b88ede1e5233af1,
     type: 3}
 --- !u!4 &227329385
@@ -191,13 +193,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   regions:
   - chunkType: 0
-    probability: 1
+    probability: 5
   - chunkType: 1
-    probability: 10
+    probability: 5
+  - chunkType: 2
+    probability: 5
   validNeighbors:
   - regionA: 0
     regionB: 0
   - regionA: 0
+    regionB: 1
+  - regionA: 1
+    regionB: 2
+  - regionA: 2
     regionB: 1
 --- !u!1001 &435030516
 PrefabInstance:
