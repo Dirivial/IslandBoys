@@ -162,6 +162,8 @@ MonoBehaviour:
     chunkType: 1
   - block: {fileID: 8626509336552461570, guid: 2ed10d852e0122a4e99355b8b9c5d36a, type: 3}
     chunkType: 2
+  - block: {fileID: 1443107715739563685, guid: 0966eff78248c3f44ab995a90d54768b, type: 3}
+    chunkType: 3
   chunkPrefab: {fileID: 6417811292781886953, guid: 1d121619a8866d348b88ede1e5233af1,
     type: 3}
 --- !u!4 &227329385
@@ -193,11 +195,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   regions:
   - chunkType: 0
-    probability: 20
+    probability: 30
   - chunkType: 1
     probability: 5
   - chunkType: 2
-    probability: 5
+    probability: 10
+  - chunkType: 3
+    probability: 10
   adjacancies:
   - regionA: 0
     regionB: 0
@@ -209,6 +213,8 @@ MonoBehaviour:
     regionB: 2
   - regionA: 2
     regionB: 2
+  - regionA: 1
+    regionB: 3
 --- !u!1 &1257676785
 GameObject:
   m_ObjectHideFlags: 0
