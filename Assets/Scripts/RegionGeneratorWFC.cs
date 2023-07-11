@@ -64,6 +64,7 @@ public class RegionGeneratorWFC : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("Start");
         chunksToProcess = new Stack<Vector2Int>();
         chunkMap = new ChunkType[CHUNK_COUNT_XZ, CHUNK_COUNT_XZ];
 
@@ -80,10 +81,6 @@ public class RegionGeneratorWFC : MonoBehaviour
                 {
                     chunkMap[x, z] = ChunkType.Sea;
                     chunksToProcess.Push(new Vector2Int(x, z));
-                } else if (x == CHUNK_COUNT_XZ / 2 && z == CHUNK_COUNT_XZ / 2)
-                {
-                    chunkMap[x, z] = ChunkType.Plains;
-                    chunksToProcess.Push(new Vector2Int(x, z));
                 }
                 else
                 {   
@@ -94,35 +91,14 @@ public class RegionGeneratorWFC : MonoBehaviour
                 }
             }
         }
-
-        ProcessChunks();
         
-        //PrintSelectedTiles();
+        // Process the chunks that were set to sea
+        ProcessChunks();
 
-        // Look if the steroids variable is correct
-        /*        foreach (Adjacency adjacency in steroids)
-                {
-                    Debug.Log(adjacency.region);
-                    foreach (ChunkType chunkType in adjacency.adjacentSouth)
-                    {
-                        Debug.Log(chunkType);
-                    }
-                    Debug.Log(" ");
-                }*/
+        // Fill the rest of the map
         GenerateMap();
-        PrintSelectedTiles();
 
-        for (int x = 0; x < CHUNK_COUNT_XZ; x++)
-        {
-            for (int z = 0; z < CHUNK_COUNT_XZ; z++)
-            {
-                if (chunkMap[x, z] == ChunkType.Unknown)
-                {
-                    chunkMap[x, z] = ChunkType.Sea;
-                }
-            }
-        }
-
+        // Draw the chunks
         globalChunkManager.DrawSomeChunks(chunkMap, CHUNK_COUNT_XZ);
     }
 
@@ -139,23 +115,23 @@ public class RegionGeneratorWFC : MonoBehaviour
             nextWave = FindLowestEntropy();
             iterations++;
         }
-        PrintEntropy();
         Debug.Log("Done");
     }
 
+    // Pick a random tile at the given chunk position, using the possible tiles at that position
     private void PickRandomTileAt(Vector2Int chunkPosition)
     {
         List<ChunkType> chunkTypes = new List<ChunkType>(chunkMapArray[chunkPosition.x, chunkPosition.y]);
         int randomIndex = Random.Range(0, chunkTypes.Count);
         
         chunkMap[chunkPosition.x, chunkPosition.y] = chunkTypes[randomIndex];
-        Debug.Log("Picked " + chunkMap[chunkPosition.x, chunkPosition.y] + " at " + chunkPosition);
         chunkMapArray[chunkPosition.x, chunkPosition.y].Clear();
         UpdateNeighbors(chunkPosition);
 
         chunksToProcess.Push(chunkPosition);
     }
 
+    // Find the first chunk with the lowest entropy
     private Vector2Int FindLowestEntropy()
     {
         // Look for the lowest entropy in the chunk map
@@ -191,6 +167,7 @@ public class RegionGeneratorWFC : MonoBehaviour
         return true;
     }
 
+    // Process the chunks that were have been but in the chunksToProcess stack
     private void ProcessChunks()
     {
         int maxIterations = 1000;
@@ -253,9 +230,9 @@ public class RegionGeneratorWFC : MonoBehaviour
         }
     }
 
+    // Update the neighbors of the given chunk position
     private void UpdateNeighbors(Vector2Int chunkPosition)
     {
-        //Debug.Log("Updating neighbors of " + chunkPosition.x + " " + chunkPosition.y);
         for (Direction i = 0; i <= Direction.West; i++)
         {
             Vector2Int neighborPosition = chunkPosition;
@@ -279,7 +256,6 @@ public class RegionGeneratorWFC : MonoBehaviour
             {
                 if (chunkMap[neighborPosition.x, neighborPosition.y] == ChunkType.Unknown && chunkMapArray[neighborPosition.x, neighborPosition.y].Count > 1)
                 {
-                    //chunksToProcess.Push(neighborPosition);
                     // Get the allowed adjacent chunks
                     HashSet<ChunkType> allowedAdjacentChunks = null;
                     foreach (Adjacency adjacency in adjacancies)
@@ -310,17 +286,6 @@ public class RegionGeneratorWFC : MonoBehaviour
                         // Update the entropy of the neighbor
                         chunkMapArray[neighborPosition.x, neighborPosition.y].IntersectWith(allowedAdjacentChunks);
 
-/*                        if (neighborPosition.x == 1 && neighborPosition.y == 1)
-                        {
-                            string d = "";
-                            Debug.Log("Allowed adjacent chunks ");
-                            foreach (ChunkType chunkType in chunkMapArray[neighborPosition.x, neighborPosition.y])
-                            {
-                                d += " " + chunkType.ToString();
-                            }
-                            Debug.Log(d);
-                        }*/
-
                         int newEntropy = GetEntropy(neighborPosition);
                         if (entropy != newEntropy)
                         {
@@ -333,41 +298,11 @@ public class RegionGeneratorWFC : MonoBehaviour
         }
     }
 
+    // Get the entropy of a chunk
     private int GetEntropy(Vector2Int chunkPosition)
     {
         return chunkMapArray[chunkPosition.x, chunkPosition.y].Count;
     }
-
-/*    private void AddPair(RegionAdjacency pair)
-    {
-        if (!chunkTypePairs.ContainsKey(pair.regionA))
-        {
-            chunkTypePairs.Add(pair.regionA, new HashSet<ChunkType>());
-        }
-
-        if (!chunkTypePairs.ContainsKey(pair.regionB))
-        {
-            chunkTypePairs.Add(pair.regionB, new HashSet<ChunkType>());
-        }
-        // Add region to each other's pairs
-
-        chunkTypePairs[pair.regionA].Add(pair.regionB);
-        chunkTypePairs[pair.regionB].Add(pair.regionA);
-    }*/
-
-/*    private void GenerateChunks()
-    {
-          for (int x = 0; x < CHUNK_COUNT_XZ; x++)
-        {
-            for (int z = 0; z < CHUNK_COUNT_XZ; z++)
-            {
-                Vector2Int chunkPosition = new Vector2Int(x, z);
-                ChunkType chunkType = DecideRegion(chunkPosition);
-                chunkMap.Add(chunkPosition, chunkType);
-            }
-        }
-    }*/
-
 
     public ChunkType GetChunkType(Vector2Int chunkPosition)
     {
@@ -383,57 +318,6 @@ public class RegionGeneratorWFC : MonoBehaviour
 
     public ChunkType DecideRegion(List<Neighbor> neighbours)
     {
-/*        HashSet<ChunkType> validRegionSet = new HashSet<ChunkType>();
-
-        if (neighbours.Count == 0) 
-        { 
-            Debug.Log("0 Neighbours"); 
-            return ChunkType.Sea;
-        } 
-        else 
-        {
-            // Add all valid regions from first neighbour
-            foreach (ChunkType type in chunkTypePairs[neighbours[0].chunkType])
-            {
-                validRegionSet.Add(type);
-            }
-
-            if (neighbours.Count > 1)
-            {
-                // Remove regions that are not valid for all neighbours
-                for (int i = 1; i < neighbours.Count; i++)
-                {
-                    HashSet<ChunkType> neighbour = new HashSet<ChunkType>(chunkTypePairs[neighbours[1].chunkType]);
-                    validRegionSet.IntersectWith(neighbour);
-                }
-            }
-        }
-
-        List<ChunkType> validRegions = new List<ChunkType>(validRegionSet);
-        List<int> probabilities = new List<int>();
-
-        int probabilitySum = 0;
-        foreach (var region in regions)
-        {
-            if (validRegions.Contains(region.chunkType))
-            {
-                probabilitySum += region.probability;
-                probabilities.Add(region.probability);
-            }
-        }
-
-        float remaining = Mathf.FloorToInt(Random.Range(0f, 1f) * probabilitySum);
-
-        for (int i = 0; i < validRegions.Count; i++)
-        {
-            remaining -= probabilities[i];
-            if (remaining <= 0)
-            {
-                return validRegions[i];
-            }
-        }
-
-        Debug.Log("Defaulting to sea " + remaining);*/
         return ChunkType.Sea;
     }
 

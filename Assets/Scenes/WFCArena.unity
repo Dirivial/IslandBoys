@@ -180,6 +180,8 @@ MonoBehaviour:
     chunkType: 11
   - block: {fileID: 3816194606835948814, guid: 96bd6ee57a559cb46979e8412f7f6624, type: 3}
     chunkType: 12
+  - block: {fileID: 1019818963528711903, guid: 5cae0ee95345a05458d656139cb22673, type: 3}
+    chunkType: 0
   chunkPrefab: {fileID: 6417811292781886953, guid: 1d121619a8866d348b88ede1e5233af1,
     type: 3}
 --- !u!4 &227329385
@@ -244,7 +246,7 @@ MonoBehaviour:
     adjacentWest: 050000000c000000
     adjacentEast: 0500000009000000
     adjacentNorth: 01000000
-    adjacentSouth: 02000000
+    adjacentSouth: 0200000007000000
   - region: 6
     adjacentWest: 02000000
     adjacentEast: 01000000
@@ -253,7 +255,7 @@ MonoBehaviour:
   - region: 7
     adjacentWest: 070000000b000000
     adjacentEast: 070000000a000000
-    adjacentNorth: 02000000
+    adjacentNorth: 0200000005000000
     adjacentSouth: 01000000
   - region: 8
     adjacentWest: 01000000
@@ -269,22 +271,22 @@ MonoBehaviour:
     adjacentWest: 05000000
     adjacentEast: 01000000
     adjacentNorth: 01000000
-    adjacentSouth: 06000000
+    adjacentSouth: 060000000a000000
   - region: 10
     adjacentWest: 07000000
     adjacentEast: 01000000
-    adjacentNorth: 06000000
+    adjacentNorth: 0600000009000000
     adjacentSouth: 01000000
   - region: 11
     adjacentWest: 01000000
     adjacentEast: 07000000
-    adjacentNorth: 08000000
+    adjacentNorth: 080000000c000000
     adjacentSouth: 01000000
   - region: 12
     adjacentWest: 01000000
     adjacentEast: 05000000
     adjacentNorth: 01000000
-    adjacentSouth: 08000000
+    adjacentSouth: 080000000b000000
   backup:
   - region: 1
     adjacentWest: 0100000006000000090000000a000000
@@ -336,7 +338,7 @@ MonoBehaviour:
     adjacentEast: 05000000
     adjacentNorth: 01000000
     adjacentSouth: 08000000
-  CHUNK_COUNT_XZ: 9
+  CHUNK_COUNT_XZ: 49
 --- !u!1 &1257676785
 GameObject:
   m_ObjectHideFlags: 0
