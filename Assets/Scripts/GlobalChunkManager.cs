@@ -6,10 +6,19 @@ using System;
 [Serializable]
 public enum ChunkType
 {
+    Unknown,
     Sea,
-    Green,
+    Plains,
     Desert,
     Snow,
+    ShoreN,
+    ShoreE,
+    ShoreS,
+    ShoreW,
+    ShoreNE,
+    ShoreSE,
+    ShoreSW,
+    ShoreNW,
 }
 
 [System.Serializable]
@@ -33,6 +42,8 @@ public class GlobalChunkManager : MonoBehaviour
     [SerializeField] private List<BlockAndChunkType> blockToChunkTypes;
     [SerializeField] private GameObject chunkPrefab;
 
+    private List<GameObject> tempChunksToLoad;
+
 
     private RegionGeneratorWFC regionGenerator;
     private Dictionary<Vector2Int, ChunkObject> chunks;
@@ -43,6 +54,7 @@ public class GlobalChunkManager : MonoBehaviour
     void Awake()
     {
         chunks = new Dictionary<Vector2Int, ChunkObject>();
+        tempChunksToLoad = new List<GameObject>();
     }
 
     // Start is called before the first frame update
@@ -62,11 +74,11 @@ public class GlobalChunkManager : MonoBehaviour
         );
 
         // If the player has moved to a new chunk, update the chunks
-        if (playerChunk != currentPlayerChunk)
+/*        if (playerChunk != currentPlayerChunk)
         {
             currentPlayerChunk = playerChunk;
             UpdateChunks();
-        }
+        }*/
     }
 
     void UpdateChunks()
@@ -111,6 +123,25 @@ public class GlobalChunkManager : MonoBehaviour
             chunks[chunk].chunkComponent.DestroyChunk();
             chunks.Remove(chunk);
         }
+    }
+
+    public void DrawSomeChunks(ChunkType[,] chunks, int size)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                GameObject gameObject = Instantiate(chunkPrefab, new Vector3(x * chunkSize, 0, y * chunkSize), Quaternion.identity);
+                gameObject.transform.parent = this.transform;
+                tempChunksToLoad.Add(gameObject);
+
+                Chunk chunkComponent = gameObject.GetComponent<Chunk>();
+
+                chunkComponent.SetChunk(x * chunkSize, y * chunkSize, chunkSize, chunks[x, y]);
+                chunkComponent.InstantiateChunk(blockToChunkTypes.Find(b => b.chunkType == chunks[x, y]).block);
+            }
+        }
+
     }
 
     public Chunk GetChunkAt(Vector2Int position)

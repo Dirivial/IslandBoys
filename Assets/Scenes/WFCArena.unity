@@ -156,14 +156,30 @@ MonoBehaviour:
   chunkSize: 32
   playerTransform: {fileID: 1708110941}
   blockToChunkTypes:
-  - block: {fileID: 7774772753548589957, guid: fa17f1e3d362c6b45952ec699f94d28a, type: 3}
-    chunkType: 0
-  - block: {fileID: 1997339237370494244, guid: 085d225f23186674a85df6b8e1889316, type: 3}
+  - block: {fileID: 1019818963528711903, guid: 5cae0ee95345a05458d656139cb22673, type: 3}
     chunkType: 1
-  - block: {fileID: 8626509336552461570, guid: 2ed10d852e0122a4e99355b8b9c5d36a, type: 3}
+  - block: {fileID: 5833171504070920963, guid: 464d7f398cbbcf74989873516ce197da, type: 3}
     chunkType: 2
-  - block: {fileID: 1443107715739563685, guid: 0966eff78248c3f44ab995a90d54768b, type: 3}
+  - block: {fileID: 8626509336552461570, guid: 2ed10d852e0122a4e99355b8b9c5d36a, type: 3}
     chunkType: 3
+  - block: {fileID: 1443107715739563685, guid: 0966eff78248c3f44ab995a90d54768b, type: 3}
+    chunkType: 4
+  - block: {fileID: 7539835745708314438, guid: 593ecf6602027594eaca596f93a632ad, type: 3}
+    chunkType: 5
+  - block: {fileID: 321870367977074718, guid: e974d0b0de8f99f429e7256fb93ff9e5, type: 3}
+    chunkType: 6
+  - block: {fileID: 4059138357462271294, guid: 080e2c8641152764db4e221c22a891b9, type: 3}
+    chunkType: 7
+  - block: {fileID: 1689082541494649447, guid: c452e5a172e59c04182b5b50380a858a, type: 3}
+    chunkType: 8
+  - block: {fileID: 5060434034983059612, guid: 2c8c3c6335cd2e640af141a86da544ff, type: 3}
+    chunkType: 9
+  - block: {fileID: 4686417756593633350, guid: ab75aef0c989e6646aa05cfb4424a601, type: 3}
+    chunkType: 10
+  - block: {fileID: 8453721297586528983, guid: 28ded2fdc3cdc734c9c51bea12bd1583, type: 3}
+    chunkType: 11
+  - block: {fileID: 3816194606835948814, guid: 96bd6ee57a559cb46979e8412f7f6624, type: 3}
+    chunkType: 12
   chunkPrefab: {fileID: 6417811292781886953, guid: 1d121619a8866d348b88ede1e5233af1,
     type: 3}
 --- !u!4 &227329385
@@ -194,27 +210,133 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   regions:
-  - chunkType: 0
-    probability: 30
   - chunkType: 1
+    probability: 30
+  - chunkType: 12
     probability: 5
   - chunkType: 2
     probability: 10
   - chunkType: 3
     probability: 10
+  - chunkType: 4
+    probability: 10
+  - chunkType: 5
+    probability: 10
+  - chunkType: 6
+    probability: 10
+  - chunkType: 7
+    probability: 10
+  - chunkType: 8
+    probability: 10
+  - chunkType: 9
+    probability: 10
+  - chunkType: 10
+    probability: 10
+  - chunkType: 11
+    probability: 10
   adjacancies:
-  - regionA: 0
-    regionB: 0
-  - regionA: 0
-    regionB: 1
-  - regionA: 1
-    regionB: 1
-  - regionA: 1
-    regionB: 2
-  - regionA: 2
-    regionB: 2
-  - regionA: 1
-    regionB: 3
+  - region: 1
+    adjacentWest: 0100000006000000090000000a000000
+    adjacentEast: 01000000080000000c0000000b000000
+    adjacentNorth: 01000000070000000a0000000b000000
+    adjacentSouth: 0100000005000000090000000c000000
+  - region: 5
+    adjacentWest: 050000000c000000
+    adjacentEast: 0500000009000000
+    adjacentNorth: 01000000
+    adjacentSouth: 02000000
+  - region: 6
+    adjacentWest: 02000000
+    adjacentEast: 01000000
+    adjacentNorth: 0900000006000000
+    adjacentSouth: 0a00000006000000
+  - region: 7
+    adjacentWest: 070000000b000000
+    adjacentEast: 070000000a000000
+    adjacentNorth: 02000000
+    adjacentSouth: 01000000
+  - region: 8
+    adjacentWest: 01000000
+    adjacentEast: 02000000
+    adjacentNorth: 080000000c000000
+    adjacentSouth: 080000000b000000
+  - region: 2
+    adjacentWest: 0200000008000000
+    adjacentEast: 0200000006000000
+    adjacentNorth: 0200000005000000
+    adjacentSouth: 0200000007000000
+  - region: 9
+    adjacentWest: 05000000
+    adjacentEast: 01000000
+    adjacentNorth: 01000000
+    adjacentSouth: 06000000
+  - region: 10
+    adjacentWest: 07000000
+    adjacentEast: 01000000
+    adjacentNorth: 06000000
+    adjacentSouth: 01000000
+  - region: 11
+    adjacentWest: 01000000
+    adjacentEast: 07000000
+    adjacentNorth: 08000000
+    adjacentSouth: 01000000
+  - region: 12
+    adjacentWest: 01000000
+    adjacentEast: 05000000
+    adjacentNorth: 01000000
+    adjacentSouth: 08000000
+  backup:
+  - region: 1
+    adjacentWest: 0100000006000000090000000a000000
+    adjacentEast: 01000000080000000c0000000b000000
+    adjacentNorth: 01000000070000000a0000000b000000
+    adjacentSouth: 0100000005000000090000000c000000
+  - region: 5
+    adjacentWest: 050000000c000000
+    adjacentEast: 0500000009000000
+    adjacentNorth: 01000000
+    adjacentSouth: 02000000
+  - region: 6
+    adjacentWest: 02000000
+    adjacentEast: 01000000
+    adjacentNorth: 0900000006000000
+    adjacentSouth: 0a00000006000000
+  - region: 7
+    adjacentWest: 070000000b000000
+    adjacentEast: 070000000a000000
+    adjacentNorth: 02000000
+    adjacentSouth: 01000000
+  - region: 8
+    adjacentWest: 01000000
+    adjacentEast: 02000000
+    adjacentNorth: 080000000c000000
+    adjacentSouth: 080000000b000000
+  - region: 2
+    adjacentWest: 0200000008000000
+    adjacentEast: 0200000006000000
+    adjacentNorth: 0200000005000000
+    adjacentSouth: 0200000007000000
+  - region: 9
+    adjacentWest: 05000000
+    adjacentEast: 01000000
+    adjacentNorth: 01000000
+    adjacentSouth: 06000000
+  - region: 10
+    adjacentWest: 07000000
+    adjacentEast: 01000000
+    adjacentNorth: 06000000
+    adjacentSouth: 01000000
+  - region: 11
+    adjacentWest: 01000000
+    adjacentEast: 07000000
+    adjacentNorth: 08000000
+    adjacentSouth: 01000000
+  - region: 12
+    adjacentWest: 01000000
+    adjacentEast: 05000000
+    adjacentNorth: 01000000
+    adjacentSouth: 08000000
+  CHUNK_COUNT_XZ: 9
 --- !u!1 &1257676785
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ public class Chunk : MonoBehaviour
     private int x;
     private int z;
     private ChunkType type;
+    private GameObject myPrefab;
 
     public void SetChunk(int x, int z, int size, ChunkType type)
     {
@@ -37,7 +38,9 @@ public class Chunk : MonoBehaviour
         // Instantiate the chunk
         // Add the chunk to the dictionary
 
-        if (type == ChunkType.Sea)
+        myPrefab = Instantiate(gameObject, new Vector3(x, 0, z), Quaternion.identity);
+        myPrefab.transform.parent = this.transform;
+/*        if (type == ChunkType.Sea)
         {
             for (int i = 0; i < size; i++)
             {
@@ -64,20 +67,21 @@ public class Chunk : MonoBehaviour
                 block.transform.parent = this.transform;
                 cells[i, j] = block;
             }
-        }
+        }*/
 
     }
 
     public void DestroyChunk()
     {
         //Debug.Log("Destroying chunk at " + x + ", " + z);
-        for (int i = 0; i < size; i++)
+  /*      for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
                 Destroy(cells[i, j]);
             }
-        }
+        }*/
+        Destroy(myPrefab);
     }
 
     public ChunkType GetChunkType()
