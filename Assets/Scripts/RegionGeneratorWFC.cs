@@ -4,13 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public enum Direction
-{
-    North,
-    East,
-    South,
-    West,
-}
+
 
 
 [System.Serializable]
@@ -43,44 +37,53 @@ public struct Neighbor
     public Direction direction;
 }
 
+public struct SaveState
+{
+    public ChunkType[,] chunkMap;
+    public HashSet<ChunkType>[,] chunkMapArray;
+    public Stack<Vector3Int> chunksToProcess;
+}
+
 public class RegionGeneratorWFC : MonoBehaviour
 {
 
     [SerializeField] private List<Region> regions;
     [SerializeField] private List<Adjacency> adjacancies;
-    [SerializeField] private List<Adjacency> backup;
-    [SerializeField] private int CHUNK_COUNT_XZ = 20;
+    [SerializeField] private int Chunk_Count_XY = 20;
+    [SerializeField] private int Clumpiness = 1;
 
     private ChunkType[,] chunkMap;
     private HashSet<ChunkType>[,] chunkMapArray;
-    private Stack<Vector2Int> chunksToProcess;
+    private Stack<Vector3Int> chunksToProcess;
+    private Stack<SaveState> saveStates;
 
     private GlobalChunkManager globalChunkManager;
 
     private void Awake()
     {
         globalChunkManager = GetComponent<GlobalChunkManager>();
+        saveStates = new Stack<SaveState>();
     }
 
     void Start()
     {
         Debug.Log("Start");
-        chunksToProcess = new Stack<Vector2Int>();
-        chunkMap = new ChunkType[CHUNK_COUNT_XZ, CHUNK_COUNT_XZ];
+        chunksToProcess = new Stack<Vector3Int>();
+        chunkMap = new ChunkType[Chunk_Count_XY, Chunk_Count_XY];
 
         // Store the initial entropy of each coordinate in the chunk map
-        chunkMapArray = new HashSet<ChunkType>[CHUNK_COUNT_XZ, CHUNK_COUNT_XZ];
+        chunkMapArray = new HashSet<ChunkType>[Chunk_Count_XY, Chunk_Count_XY];
 
         // Set the edges to be sea
-        for (int x = 0; x < CHUNK_COUNT_XZ; x++)
+        for (int x = 0; x < Chunk_Count_XY; x++)
         {
-            for (int z = 0; z < CHUNK_COUNT_XZ; z++)
+            for (int z = 0; z < Chunk_Count_XY; z++)
             {
                 chunkMapArray[x, z] = new HashSet<ChunkType>();
-                if (x == 0 || x == CHUNK_COUNT_XZ - 1 || z == 0 || z == CHUNK_COUNT_XZ - 1)
+                if (x == 0 || x == Chunk_Count_XY - 1 || z == 0 || z == Chunk_Count_XY - 1)
                 {
                     chunkMap[x, z] = ChunkType.Sea;
-                    chunksToProcess.Push(new Vector2Int(x, z));
+                    chunksToProcess.Push(new Vector3Int(x, z));
                 }
                 else
                 {   
@@ -99,14 +102,14 @@ public class RegionGeneratorWFC : MonoBehaviour
         GenerateMap();
 
         // Draw the chunks
-        globalChunkManager.DrawSomeChunks(chunkMap, CHUNK_COUNT_XZ);
+        globalChunkManager.DrawSomeChunks(chunkMap, Chunk_Count_XY);
     }
 
     private void GenerateMap()
     {
-        int maxIterations = CHUNK_COUNT_XZ * CHUNK_COUNT_XZ;
+        int maxIterations = Chunk_Count_XY * Chunk_Count_XY;
         int iterations = 0;
-        Vector2Int nextWave = FindLowestEntropy();
+        Vector3Int nextWave = FindLowestEntropy();
 
         while (nextWave.x != -1 && nextWave.y != -1 && iterations < maxIterations)
         {
@@ -119,12 +122,9 @@ public class RegionGeneratorWFC : MonoBehaviour
     }
 
     // Pick a random tile at the given chunk position, using the possible tiles at that position
-    private void PickRandomTileAt(Vector2Int chunkPosition)
+    private void PickRandomTileAt(Vector3Int chunkPosition)
     {
-        List<ChunkType> chunkTypes = new List<ChunkType>(chunkMapArray[chunkPosition.x, chunkPosition.y]);
-        int randomIndex = Random.Range(0, chunkTypes.Count);
-        
-        chunkMap[chunkPosition.x, chunkPosition.y] = chunkTypes[randomIndex];
+        chunkMap[chunkPosition.x, chunkPosition.y] = ChooseChunkTypeAt(chunkPosition.x, chunkPosition.y);
         chunkMapArray[chunkPosition.x, chunkPosition.y].Clear();
         UpdateNeighbors(chunkPosition);
 
@@ -132,39 +132,49 @@ public class RegionGeneratorWFC : MonoBehaviour
     }
 
     // Find the first chunk with the lowest entropy
-    private Vector2Int FindLowestEntropy()
+    private Vector3Int FindLowestEntropy()
     {
         // Look for the lowest entropy in the chunk map
         int lowestEntropy = regions.Count;
-        Vector2Int lowestEntropyPosition = new Vector2Int(-1, -1);
-        for (int x = 1; x < CHUNK_COUNT_XZ - 1; x++)
+        Vector3Int lowestEntropyPosition = new Vector3Int(-1, -1);
+        for (int x = 1; x < Chunk_Count_XY - 1; x++)
         {
-            for (int z = 1; z < CHUNK_COUNT_XZ - 1; z++)
+            for (int z = 1; z < Chunk_Count_XY - 1; z++)
             {
                 if (chunkMapArray[x, z].Count < lowestEntropy && chunkMapArray[x, z].Count > 0)
                 {
                     lowestEntropy = chunkMapArray[x, z].Count;
-                    lowestEntropyPosition = new Vector2Int(x, z);
+                    lowestEntropyPosition = new Vector3Int(x, z);
                 }
             }
         }
         return lowestEntropyPosition;
     }
 
-    private bool CheckDone()
+    private ChunkType ChooseChunkTypeAt(int x, int z)
     {
-        // Check if all chunks have a selected chunk type
-        for (int x = 0; x < CHUNK_COUNT_XZ; x++)
+        List<ChunkType> chunkTypes = new List<ChunkType>(chunkMapArray[x, z]);
+
+        for (int i = -1; i < 2; i += 2)
         {
-            for (int z = 0; z < CHUNK_COUNT_XZ; z++)
+            if (x + i >= 0 && x + i < Chunk_Count_XY && chunkMapArray[x+i, z].Contains(chunkMap[x + i, z]))
             {
-                if (chunkMap[x, z] == ChunkType.Unknown)
+                for (int j = 0; j < Clumpiness; j++)
                 {
-                    return false;
+                    chunkTypes.Add(chunkMap[x + i, z]);
+                }
+            }
+            if (z + i >= 0 && z + i < Chunk_Count_XY && chunkMapArray[x, z + i].Contains(chunkMap[x, z + i]))
+            {
+                for (int j = 0; j < Clumpiness; j++)
+                {
+                    chunkTypes.Add(chunkMap[x, z + i]);
                 }
             }
         }
-        return true;
+
+        // Choose a random chunk type from the list of possible chunk types
+        return chunkTypes[Random.Range(0, chunkTypes.Count)];
     }
 
     // Process the chunks that were have been but in the chunksToProcess stack
@@ -174,7 +184,7 @@ public class RegionGeneratorWFC : MonoBehaviour
         int i = 0;
         while (chunksToProcess.Count > 0 && maxIterations > i)
         {
-            Vector2Int chunkPosition = chunksToProcess.Pop();
+            Vector3Int chunkPosition = chunksToProcess.Pop();
             /*Debug.Log(chunkPosition);*/
             if (GetEntropy(chunkPosition) == 1)
             {
@@ -193,9 +203,9 @@ public class RegionGeneratorWFC : MonoBehaviour
     private void PrintEntropy()
     {
         string output = "";
-        for (int x = 0; x < CHUNK_COUNT_XZ; x++)
+        for (int x = 0; x < Chunk_Count_XY; x++)
         {
-            for (int z = 0; z < CHUNK_COUNT_XZ; z++)
+            for (int z = 0; z < Chunk_Count_XY; z++)
             {
                 output += " " + chunkMapArray[x, z].Count.ToString();
             }
@@ -207,9 +217,9 @@ public class RegionGeneratorWFC : MonoBehaviour
     private void PrintSelectedTiles()
     {
         string output = "";
-        for (int x = 0; x < CHUNK_COUNT_XZ; x++)
+        for (int x = 0; x < Chunk_Count_XY; x++)
         {
-            for (int z = 0; z < CHUNK_COUNT_XZ; z++)
+            for (int z = 0; z < Chunk_Count_XY; z++)
             {
                 if (chunkMapArray[x, z].Count == 0)
                 {
@@ -231,18 +241,18 @@ public class RegionGeneratorWFC : MonoBehaviour
     }
 
     // Update the neighbors of the given chunk position
-    private void UpdateNeighbors(Vector2Int chunkPosition)
+    private void UpdateNeighbors(Vector3Int chunkPosition)
     {
-        for (Direction i = 0; i <= Direction.West; i++)
+        for (Direction i = 0; i <= Direction.Down; i++)
         {
-            Vector2Int neighborPosition = chunkPosition;
+            Vector3Int neighborPosition = chunkPosition;
             switch (i)
             {
                 case Direction.North:
-                    neighborPosition.y += 1;
+                    neighborPosition.z += 1;
                     break;
                 case Direction.South:
-                    neighborPosition.y -= 1;
+                    neighborPosition.z -= 1;
                     break;
                 case Direction.East:
                     neighborPosition.x += 1;
@@ -250,9 +260,15 @@ public class RegionGeneratorWFC : MonoBehaviour
                 case Direction.West:
                     neighborPosition.x -= 1;
                     break;
+                case Direction.Down:
+                    neighborPosition.y -= 1;
+                    break;
+                case Direction.Up:
+                    neighborPosition.y += 1;
+                    break;
             }
 
-            if (neighborPosition.x >= 0 && neighborPosition.x < CHUNK_COUNT_XZ - 1 && neighborPosition.y >= 0 && neighborPosition.y < CHUNK_COUNT_XZ - 1)
+            if (neighborPosition.x >= 0 && neighborPosition.x < Chunk_Count_XY - 1 && neighborPosition.y >= 0 && neighborPosition.y < Chunk_Count_XY - 1)
             {
                 if (chunkMap[neighborPosition.x, neighborPosition.y] == ChunkType.Unknown && chunkMapArray[neighborPosition.x, neighborPosition.y].Count > 1)
                 {
@@ -299,14 +315,14 @@ public class RegionGeneratorWFC : MonoBehaviour
     }
 
     // Get the entropy of a chunk
-    private int GetEntropy(Vector2Int chunkPosition)
+    private int GetEntropy(Vector3Int chunkPosition)
     {
         return chunkMapArray[chunkPosition.x, chunkPosition.y].Count;
     }
 
-    public ChunkType GetChunkType(Vector2Int chunkPosition)
+    public ChunkType GetChunkType(Vector3Int chunkPosition)
     {
-        if (chunkPosition.x < CHUNK_COUNT_XZ && chunkPosition.y < CHUNK_COUNT_XZ)
+        if (chunkPosition.x < Chunk_Count_XY && chunkPosition.y < Chunk_Count_XY)
         {
             return chunkMap[chunkPosition.x, chunkPosition.y];
         }
@@ -325,9 +341,9 @@ public class RegionGeneratorWFC : MonoBehaviour
     {
         if (chunkMap != null)
         {
-            for (int x = 0; x < CHUNK_COUNT_XZ; x++)
+            for (int x = 0; x < Chunk_Count_XY; x++)
             {
-                for (int z = 0; z < CHUNK_COUNT_XZ; z++)
+                for (int z = 0; z < Chunk_Count_XY; z++)
                 {
                     Vector3 chunkPosition = new Vector3(x, 0, z);
                     switch (chunkMap[x, z])
