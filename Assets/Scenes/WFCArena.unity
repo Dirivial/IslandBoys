@@ -123,6 +123,12 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &509054103 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 139183056729019971, guid: 0104da18c6a8cdc4798f5815391f7098,
+    type: 3}
+  m_PrefabInstance: {fileID: 7201143641786810451}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1257676785
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,6 +384,137 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!1 &2028599644
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2028599645}
+  - component: {fileID: 2028599646}
+  m_Layer: 0
+  m_Name: VoxelGang
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2028599645
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028599644}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 509054103}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2028599646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028599644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f59359d1e49da7c488f5bc473344f39d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  voxelTypes:
+  - x: 0
+    y: 0
+    z: 0
+    voxelObject: {fileID: 8657189267615039759, guid: bad6a165ab43a2b4a842cd9cd20ffb1f,
+      type: 3}
+    name: Empty
+    symmetry: 0
+    connections: []
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - x: 0
+    y: 0
+    z: 0
+    voxelObject: {fileID: 1330280528381846513, guid: 77fc479d0a2cb824d908b682b306ca4d,
+      type: 3}
+    name: Ground
+    symmetry: 0
+    connections:
+    - dir: 4
+      id: 0
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - x: 0
+    y: 0
+    z: 0
+    voxelObject: {fileID: 8147017978566268856, guid: 6640120548b5d0641a1cd4bfd10191d9,
+      type: 3}
+    name: Turn
+    symmetry: 1
+    connections:
+    - dir: 0
+      id: 0
+    - dir: 2
+      id: 0
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - x: 0
+    y: 0
+    z: 0
+    voxelObject: {fileID: 1508886160661466985, guid: 6a48e8121ea0eb24b9a5401a0682e8f2,
+      type: 3}
+    name: Down
+    symmetry: 3
+    connections:
+    - dir: 5
+      id: 0
+    - dir: 2
+      id: 0
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - x: 0
+    y: 0
+    z: 0
+    voxelObject: {fileID: 5891977651945633426, guid: cbe07edf8ad60cd4ea99fbdd5837a9f7,
+      type: 3}
+    name: Up
+    symmetry: 3
+    connections:
+    - dir: 4
+      id: 0
+    - dir: 2
+      id: 0
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - x: 0
+    y: 0
+    z: 0
+    voxelObject: {fileID: 3564089449883909529, guid: 6f8da44b949c80446b5fe7eea83b0a03,
+      type: 3}
+    name: Vertical
+    symmetry: 0
+    connections:
+    - dir: 4
+      id: 0
+    - dir: 5
+      id: 0
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - x: 0
+    y: 0
+    z: 0
+    voxelObject: {fileID: 6144670608197194975, guid: 2733fb6d90e5cc845b58af5cf97b105a,
+      type: 3}
+    name: Line
+    symmetry: 2
+    connections:
+    - dir: 2
+      id: 0
+    - dir: 3
+      id: 0
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  voxelSize: 3
 --- !u!1001 &7201143641786810451
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -468,6 +605,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 139183056729019971, guid: 0104da18c6a8cdc4798f5815391f7098,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2028599645}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0104da18c6a8cdc4798f5815391f7098, type: 3}

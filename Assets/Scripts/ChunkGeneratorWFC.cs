@@ -37,10 +37,9 @@ public struct Connection
 }
 
 [Serializable]
-public struct Voxel
+public class Voxel
 {
     public int x, y, z;
-    public Color color;
     public GameObject voxelObject;
     public string name;
     public Symmetry symmetry;
@@ -48,13 +47,12 @@ public struct Voxel
     public List<Connection> connections;
     public Quaternion rotation;
 
-    public Voxel(int x, int y, int z, Color color, GameObject voxelObject, string name, Symmetry symmetry, List<Connection> connections)
+    public Voxel(int x, int y, int z, GameObject voxelObject, string name, Symmetry symmetry, List<Connection> connections)
     {
         this.x = x;
         this.y = y;
         this.z = z;
         this.rotation = Quaternion.identity;
-        this.color = color;
         this.voxelObject = voxelObject;
         this.symmetry = symmetry;
         this.name = name;
@@ -111,38 +109,66 @@ public struct Voxel
 public class ChunkGeneratorWFC : MonoBehaviour
 {
 
-    [SerializeField] private List<Voxel> voxelTypes;
+    private List<Voxel> voxelTypes;
     [SerializeField] public Vector3Int dimensions = new Vector3Int(5, 5, 5);
-    [SerializeField] private int VoxelSize = 3;
-    public bool yo = false;
 
     private int voxelCount = 1;
+    private bool setupComplete = false;
     private Voxel[,,] voxelMap;
     private bool[,,][] voxelMapArray;
     private Stack<Vector3Int> voxelsToProcess;
 /*    private Stack<SaveState> saveStates;*/
+
+    private List<GameObject> boi;
+    private VoxelGang voxelGang;
+    private int voxelSize = 3;
 
     private void Awake()
     {
         voxelsToProcess = new Stack<Vector3Int>();
         voxelMap = new Voxel[dimensions.x, dimensions.y, dimensions.z];
 
-        voxelCount = voxelTypes.Count;
-
         // Store the initial entropy of each coordinate in the chunk map
         voxelMapArray = new bool[dimensions.x, dimensions.y, dimensions.z][];
-        
+        boi = new List<GameObject>();
+        voxelGang = GetComponentInChildren<VoxelGang>();
     }
 
     void Start()
     {
-        Debug.Log("Start");
+        voxelCount = voxelGang.GetVoxelTypesCount();
+        voxelSize = voxelGang.GetVoxelSize();
+        voxelTypes = voxelGang.GetVoxelTypes();
 
-        ComputeRotations();
+        // For testing
+        //InstantiateVoxelTypes();
+    }
 
-        voxelCount = voxelTypes.Count;
-        Debug.Log("Voxel count: " + voxelCount);
+    public void Clear()
+    {
+        voxelsToProcess.Clear();
+        voxelMap = new Voxel[dimensions.x, dimensions.y, dimensions.z];
+        for (int i = boi.Count - 1; i >= 0; i--)
+        {
+            Destroy(boi[i]);
+        }
+        setupComplete = false;
+    }
 
+    public void Setup()
+    {
+        Debug.Log("Generating a new model");
+
+        for (int i = boi.Count - 1; i >= 0; i--)
+        {
+            Destroy(boi[i]);
+        }
+        boi.Clear();
+        voxelsToProcess = new Stack<Vector3Int>();
+        voxelMap = new Voxel[dimensions.x, dimensions.y, dimensions.z];
+
+        // Store the initial entropy of each coordinate in the chunk map
+        voxelMapArray = new bool[dimensions.x, dimensions.y, dimensions.z][];
         for (int x = 0; x < dimensions.x; x++)
         {
             for (int z = 0; z < dimensions.z; z++)
@@ -161,7 +187,7 @@ public class ChunkGeneratorWFC : MonoBehaviour
                     }
                     else // The rest should be empty
                     {
-                        voxelMap[x, y, z] = new Voxel();
+                        voxelMap[x, y, z] = new Voxel(x, y, z, null, "", Symmetry.X, new List<Connection>());
                         for (int i = 0; i < voxelTypes.Count; i++)
                         {
                             voxelMapArray[x, y, z][i] = true;
@@ -171,38 +197,49 @@ public class ChunkGeneratorWFC : MonoBehaviour
                 }
             }
         }
-
-        // Process the chunks that were set to sea
         ProcessChunks();
 
-        // Fill the rest of the map
-        //GenerateMap();
-
-        // Draw the chunks
         InstantiateDeezNuts();
+        setupComplete = true;
+    }
 
-        // Instantiate all of the different types of voxels
-        //InstantiateVoxels();
+    public void GenerateFull()
+    {
+        Setup();
 
-        //PrintConnections();
+        int maxIterations = dimensions.x * dimensions.y * dimensions.z;
+        int iterations = 0;
+        Vector3Int nextWave = FindLowestEntropy();
 
-        //PrintStuff();
+        while (nextWave.x != -1 && nextWave.y != -1 && iterations < maxIterations)
+        {
+            PickTileAt(nextWave);
+            ProcessChunks();
+            nextWave = FindLowestEntropy();
+            iterations++;
+        }
+        InstantiateDeezNuts();
     }
 
     public void TakeStep()
     {
-        Debug.Log("Gangnam Style");
+        if (!setupComplete)
+        {
+            Setup();
+            setupComplete = true;
+        }
 
         Vector3Int nextWave = FindLowestEntropy();
+        Debug.Log(nextWave);
 
-        if (nextWave.x != -1 && nextWave.y != -1)
+        if (nextWave.x != -1 && nextWave.y != -1 && nextWave.z != -1)
         {
-            PickRandomTileAt(nextWave);
+            PickTileAt(nextWave);
             ProcessChunks();
-            InstantiateDeezNut(nextWave.x ,nextWave.y, nextWave.z);
+            InstantiateDeezNut(nextWave.x, nextWave.y, nextWave.z);
         } else
         {
-            Debug.Log("Uh oh");
+            Debug.Log("Could not get any further");
         }
     }
 
@@ -238,12 +275,13 @@ public class ChunkGeneratorWFC : MonoBehaviour
         }
     }
 
-    private void InstantiateVoxels()
+    // Just to make sure that the rotations are correct - this should be kept for later when we add more types of voxels
+    private void InstantiateVoxelTypes()
     {
         float i = 0.0f;
         foreach (Voxel voxel in voxelTypes)
         {
-            GameObject obj = Instantiate(voxel.voxelObject, new Vector3(voxel.x * VoxelSize + i * VoxelSize, voxel.y * VoxelSize, voxel.z * VoxelSize), voxel.rotation);
+            GameObject obj = Instantiate(voxel.voxelObject, new Vector3(voxel.x * voxelSize + i * voxelSize, voxel.y * voxelSize, voxel.z * voxelSize), voxel.rotation);
             obj.transform.parent = transform;
             i += 1.1f;
         }
@@ -259,10 +297,10 @@ public class ChunkGeneratorWFC : MonoBehaviour
                 {
                     if (voxelMap[x, y, z].IsDecided())
                     {
-                        Debug.Log("Heey " + voxelMap[x, y, z].name + " " + x + " " + y + " " + z);
-                        GameObject obj = Instantiate(voxelMap[x, y, z].voxelObject, new Vector3(x * VoxelSize, y * VoxelSize, z * VoxelSize), voxelMap[x, y, z].rotation);
+                        //Debug.Log("Heey " + voxelMap[x, y, z].name + " " + x + " " + y + " " + z);
+                        GameObject obj = Instantiate(voxelMap[x, y, z].voxelObject, new Vector3(x * voxelSize, y * voxelSize, z * voxelSize), voxelMap[x, y, z].rotation);
                         obj.transform.parent = transform;
-                        
+                        boi.Add(obj);
                     }
                 }
             }
@@ -271,18 +309,20 @@ public class ChunkGeneratorWFC : MonoBehaviour
 
     private void InstantiateDeezNut(int x, int y, int z)
     {
-
         if (voxelMap[x, y, z].IsDecided())
         {
-            Debug.Log("Heey " + voxelMap[x, y, z].name + " " + x + " " + y + " " + z);
-            GameObject obj = Instantiate(voxelMap[x, y, z].voxelObject, new Vector3(x * VoxelSize, y * VoxelSize, z * VoxelSize), voxelMap[x, y, z].rotation);
+            //Debug.Log("Heey " + voxelMap[x, y, z].name + " " + x + " " + y + " " + z);
+            GameObject obj = Instantiate(voxelMap[x, y, z].voxelObject, new Vector3(x * voxelSize, y * voxelSize, z * voxelSize), voxelMap[x, y, z].rotation);
             obj.transform.parent = transform;
-
+            boi.Add(obj);
         }
-
+        else
+        {
+            Debug.Log("Uhhh");
+        }
     }
 
-    private void ComputeRotations()
+/*    private void ComputeRotations()
     {
         List<Voxel> newVoxelTypes = new List<Voxel>();
         foreach (Voxel voxelType in voxelTypes)
@@ -340,8 +380,7 @@ public class ChunkGeneratorWFC : MonoBehaviour
                     newVoxelTypes.Add(my_voxel);
                     break;
                 case Symmetry.D:
-                    //cardinality = 2;
-
+                    // Todo, implement this shiz
                     break;
                 default:
                     // No rotations / reflections
@@ -350,8 +389,9 @@ public class ChunkGeneratorWFC : MonoBehaviour
         }
         // Save the new voxel types
         voxelTypes.AddRange(newVoxelTypes);
-    }
+    }*/
 
+/*    // Rotate a direction clockwise, X times
     private Direction RotateClockwise(Direction dir, int times)
     {
         Direction direction;
@@ -375,34 +415,22 @@ public class ChunkGeneratorWFC : MonoBehaviour
         }
         if (times > 1) return RotateClockwise(direction, times - 1);
         else return direction;
-    }
-
-    private void GenerateMap()
-    {
-        int maxIterations = dimensions.x * dimensions.y * dimensions.z;
-        int iterations = 0;
-        Vector3Int nextWave = FindLowestEntropy();
-
-        while (nextWave.x != -1 && nextWave.y != -1 && iterations < maxIterations)
-        {
-            PickRandomTileAt(nextWave);
-            ProcessChunks();
-            nextWave = FindLowestEntropy();
-            iterations++;
-        }
-        Debug.Log("Done");
-    }
+    }*/
 
     // Pick a random tile at the given chunk position, using the possible tiles at that position
-    private void PickRandomTileAt(Vector3Int voxelPosition)
+    private void PickTileAt(Vector3Int voxelPosition)
     {
-        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z] = ChooseVoxelTypeAt(voxelPosition.x, voxelPosition.y, voxelPosition.z);
+        Voxel v = ChooseVoxelTypeAt(voxelPosition.x, voxelPosition.y, voxelPosition.z);
+        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].voxelObject = v.voxelObject;
+        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].rotation = v.rotation;
+        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].name = v.name;
+        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].connections = v.connections;
         voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].ToggleDecided();
         for (int i = 0; i < voxelTypes.Count; i++) {
             voxelMapArray[voxelPosition.x, voxelPosition.y, voxelPosition.z][i] = false;
         }
         
-        UpdateNeighbors(voxelPosition);
+        //UpdateNeighbors(voxelPosition); // I dunno walter, I guess we just update the neighbors ?? why would I do this?? 
 
         voxelsToProcess.Push(voxelPosition);
     }
@@ -422,7 +450,7 @@ public class ChunkGeneratorWFC : MonoBehaviour
                     int possibleTileCount = voxelMapArray[x,y,z].Count(c => c == true);
                     //Debug.Log(possibleTileCount);
 
-                    if (possibleTileCount < lowestEntropy && possibleTileCount > 1)
+                    if (possibleTileCount < lowestEntropy && possibleTileCount > 0)
                     {
                         lowestEntropy = possibleTileCount;
                         lowestEntropyPosition = new Vector3Int(x, y, z);
@@ -440,44 +468,30 @@ public class ChunkGeneratorWFC : MonoBehaviour
         {
             if (voxelMapArray[x, y, z][i])
             {
-                // Log coordinates
-                //Debug.Log(x + " " + y + " " + z + "  i: " + i);
                 voxelTypesToChooseFrom.Add(voxelTypes[i]);
             }
         }
 
-        // TODO: Implement a better way to clump/link these together
-/*        for (int i = -1; i < 2; i += 2)
+        // Find a way to choose voxels that do not exit out to the world. i.e. add constraints
+/*        Debug.Log("I could have chosen from ");
+        foreach (Voxel vo in voxelTypesToChooseFrom)
         {
-            
-            if (x + i >= 0 && x + i < dimensions.x && voxelMapArray[x + i, y, z].Contains(voxelMap[x + i, y, z]))
-            {
-                for (int j = 0; j < Clumpiness; j++)
-                {
-                    voxelTypes.Add(voxelMap[x + i, y, z]);
-                }
-            }
-            if (z + i >= 0 && z + i < dimensions.z && voxelMapArray[x, y, z + i].Contains(voxelMap[x, y, z + i]))
-            {
-                for (int j = 0; j < Clumpiness; j++)
-                {
-                    voxelTypes.Add(voxelMap[x, y, z + i]);
-                }
-            }
-        }*/
+            Debug.Log(vo.name);
+        }
+        Debug.Log("-------------");*/
 
-/*        Debug.Log("Voxel types to choose from: ");
-        foreach (Voxel v in voxelTypesToChooseFrom)
-        {
-            Debug.Log(v.name);
-        }*/
+        Voxel v;
 
-        // Choose a random chunk type from the list of possible chunk types
+        // Choose a random voxel type from the list of possible voxel types
         if (voxelTypesToChooseFrom.Count > 1)
         {
-            return voxelTypesToChooseFrom[Random.Range(1, voxelTypesToChooseFrom.Count)];
+            v = voxelTypesToChooseFrom[Random.Range(1, voxelTypesToChooseFrom.Count)];
+        } else
+        {
+            v = voxelTypesToChooseFrom[Random.Range(0, voxelTypesToChooseFrom.Count)];
         }
-        return voxelTypesToChooseFrom[Random.Range(0, voxelTypesToChooseFrom.Count)];
+        /*Debug.Log("I chose " + v.name);*/
+        return v;
     }
 
     // Process the chunks that were have been but in the chunksToProcess stack
@@ -625,7 +639,7 @@ public class ChunkGeneratorWFC : MonoBehaviour
                     for (int y = 0; y < dimensions.y; y++)
                     {
                         Vector3 chunkPosition = new Vector3(x, 0, z);
-                        Gizmos.color = voxelMap[x, y, z].color;
+                        Gizmos.color = Color.black;
                         Gizmos.DrawCube(chunkPosition, new Vector3(1, 1, 1));
                     }
                 }
