@@ -25,23 +25,10 @@ public enum Symmetry
     D, // This should be '\\', I chose D for diagonal
 }
 
-[Serializable]
-public struct Connection
-{
-    public Direction dir;
-    public int id;
-
-    public Connection(Direction dir, int id)
-    {
-        this.dir = dir;
-        this.id = id;
-    }
-}
-
 public class ChunkGeneratorWFC : MonoBehaviour
 {
 
-    private List<Voxel> voxelTypes;
+    private List<VoxelType> voxelTypes;
     [SerializeField] public Vector3Int dimensions = new Vector3Int(5, 5, 5);
 
     private int voxelCount = 1;
@@ -74,6 +61,26 @@ public class ChunkGeneratorWFC : MonoBehaviour
 
         // For testing
         //InstantiateVoxelTypes();
+
+        //PrintConnectionDirs();
+    }
+
+    private void PrintConnectionDirs()
+    {
+        string debugString;
+        for (int i = 0; i < voxelCount; i++)
+        {
+            VoxelType v = voxelTypes[i];
+            debugString = v.name;
+            for (int j = 0; j < 6; j++)
+            {
+                if (v.connections[j] > 0)
+                { 
+                    debugString += ", " + (Direction)j;
+                }
+            }
+            Debug.Log(debugString);
+        }
     }
 
     public void Clear()
@@ -112,16 +119,15 @@ public class ChunkGeneratorWFC : MonoBehaviour
                     // Set floor to be ground tiles
                     if (y == 0 && x == 0)
                     {
-                        Voxel v = new Voxel(x, y, z, voxelTypes[1].voxelObject, "", Symmetry.X, new List<Connection>(voxelTypes[1].connections));
+                        Voxel v = new Voxel(x, y, z, 1);
                         voxelMap[x, y, z] = v;
-                        voxelMap[x, y, z].ToggleDecided();
                         //voxelMapArray[x, y, z][1] = true;
                         voxelsToProcess.Push(new Vector3Int(x, y, z));
                     }
                     else // The rest should be empty
                     {
 
-                        voxelMap[x, y, z] = new Voxel(x, y, z, null, "", Symmetry.X, new List<Connection>());
+                        voxelMap[x, y, z] = new Voxel(x, y, z, -1);
                         for (int i = 2; i < voxelTypes.Count; i++) // THIS MIGHT MAKE STUFF BREAK IN THE FUTURE
                         {
                             voxelMapArray[x, y, z][i] = true;
@@ -188,26 +194,13 @@ public class ChunkGeneratorWFC : MonoBehaviour
             {
                 for (int y = 0; y < dimensions.y; y++)
                 {
-                    if (voxelMap[x, y, z].IsDecided())
+                    int index = voxelMap[x, y, z].VoxelTypeIndex;
+                    if (index != -1)
                     {
-                        Debug.Log("Decided: " + voxelMap[x, y, z].name + " " + voxelMap[x, y, z].GetCoordinate());
+                        Debug.Log("Decided: " + voxelTypes[index] + " " + voxelMap[x, y, z].Coordinate);
                     }
                 }
             }
-        }
-    }
-
-    private void PrintConnections()
-    {
-        // For every type of voxel, print out its connections
-        foreach (Voxel voxel in voxelTypes)
-        {
-            Debug.Log("Name: " + voxel.name + " # " + voxel.connections.Count);
-            foreach (Connection connection in voxel.connections)
-            {
-                Debug.Log(connection.dir + " " + connection.id);
-            }
-            Debug.Log("----------------");
         }
     }
 
@@ -215,7 +208,7 @@ public class ChunkGeneratorWFC : MonoBehaviour
     private void InstantiateVoxelTypes()
     {
         float i = 0.0f;
-        foreach (Voxel voxel in voxelTypes)
+        foreach (VoxelType voxel in voxelTypes)
         {
             GameObject obj = Instantiate(voxel.voxelObject, new Vector3(voxel.x * voxelSize + i * voxelSize, voxel.y * voxelSize, voxel.z * voxelSize), voxel.rotation);
             obj.transform.parent = transform;
@@ -231,10 +224,16 @@ public class ChunkGeneratorWFC : MonoBehaviour
             {
                 for (int y = 0; y < dimensions.y; y++)
                 {
-                    if (voxelMap[x, y, z].IsDecided())
+                    int index = voxelMap[x, y, z].VoxelTypeIndex;
+                    if (index != -1)
                     {
                         //Debug.Log("Heey " + voxelMap[x, y, z].name + " " + x + " " + y + " " + z);
-                        GameObject obj = Instantiate(voxelMap[x, y, z].voxelObject, new Vector3(x * voxelSize, y * voxelSize, z * voxelSize), voxelMap[x, y, z].rotation);
+                        GameObject obj = Instantiate(voxelTypes[index].voxelObject, new Vector3(x * voxelSize, y * voxelSize, z * voxelSize), voxelTypes[index].rotation);
+                        obj.transform.parent = transform;
+                        boi.Add(obj);
+                    } else
+                    {
+                        GameObject obj = Instantiate(voxelTypes[0].voxelObject, new Vector3(x * voxelSize, y * voxelSize, z * voxelSize), Quaternion.identity);
                         obj.transform.parent = transform;
                         boi.Add(obj);
                     }
@@ -247,35 +246,34 @@ public class ChunkGeneratorWFC : MonoBehaviour
     {
         foreach (Vector3Int v in toInstantiate)
         {
-            GameObject obj = Instantiate(voxelMap[v.x, v.y, v.z].voxelObject, new Vector3(v.x * voxelSize, v.y * voxelSize, v.z * voxelSize), voxelMap[v.x, v.y, v.z].rotation);
+            VoxelType voxelType = voxelTypes[voxelMap[v.x, v.y, v.z].VoxelTypeIndex];
+            GameObject obj = Instantiate(voxelType.voxelObject, new Vector3(v.x * voxelSize, v.y * voxelSize, v.z * voxelSize), voxelType.rotation);
             obj.transform.parent = transform;
             boi.Add(obj);
+            Debug.Log(voxelType.name);
         }
     }
 
-    // Pick a random tile at the given chunk position, using the possible tiles at that position
-    private void PickTileAt(Vector3Int voxelPosition)
+    // Pick a random tile at the given voxel position, using the possible tiles at that position
+    private void PickTileAt(Vector3Int pos)
     {
-        Voxel v = ChooseVoxelTypeAt(voxelPosition.x, voxelPosition.y, voxelPosition.z);
-        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].voxelObject = v.voxelObject;
-        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].rotation = v.rotation;
-        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].name = v.name;
-        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].connections = v.connections;
-        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].ToggleDecided();
+        VoxelType v = ChooseVoxelTypeAt(pos.x, pos.y, pos.z);
+        voxelMap[pos.x, pos.y, pos.z].VoxelTypeIndex = voxelTypes.IndexOf(v);
+
         for (int i = 0; i < voxelTypes.Count; i++)
         {
-            voxelMapArray[voxelPosition.x, voxelPosition.y, voxelPosition.z][i] = false;
+            voxelMapArray[pos.x, pos.y, pos.z][i] = false;
         }
 
         //UpdateNeighbors(voxelPosition); // I dunno walter, I guess we just update the neighbors ?? why would I do this?? 
 
-        voxelsToProcess.Push(voxelPosition);
+        voxelsToProcess.Push(pos);
     }
 
-    // Find the first chunk with the lowest entropy
+    // Find the first voxel with the lowest entropy
     private Vector3Int FindLowestEntropy()
     {
-        // Look for the lowest entropy in the chunk map
+        // Look for the lowest entropy in the voxel map
         int lowestEntropy = voxelCount + 1;
         Vector3Int lowestEntropyPosition = new Vector3Int(-1, -1, -1);
         for (int x = 0; x < dimensions.x; x++)
@@ -284,7 +282,7 @@ public class ChunkGeneratorWFC : MonoBehaviour
             {
                 for (int y = 0; y < dimensions.y; y++)
                 {
-                    if (voxelMap[x, y, z].IsDecided()) continue;
+                    if (voxelMap[x, y, z].VoxelTypeIndex != -1) continue;
                     int possibleTileCount = voxelMapArray[x, y, z].Count(c => c == true);
                     //Debug.Log(possibleTileCount);
                     //if (x == 0 && y == 1 && z == 1) Debug.Log(possibleTileCount);
@@ -300,9 +298,9 @@ public class ChunkGeneratorWFC : MonoBehaviour
         return lowestEntropyPosition;
     }
 
-    private Voxel ChooseVoxelTypeAt(int x, int y, int z)
+    private VoxelType ChooseVoxelTypeAt(int x, int y, int z)
     {
-        List<Voxel> voxelTypesToChooseFrom = new List<Voxel>();
+        List<VoxelType> voxelTypesToChooseFrom = new List<VoxelType>();
         for (int i = 0; i < voxelCount; i++)
         {
             if (voxelMapArray[x, y, z][i])
@@ -319,7 +317,7 @@ public class ChunkGeneratorWFC : MonoBehaviour
                 }
                 Debug.Log("-------------");*/
 
-        Voxel v;
+        VoxelType v;
 
         // Choose a random voxel type from the list of possible voxel types
         if (voxelTypesToChooseFrom.Count > 1)
@@ -345,25 +343,22 @@ public class ChunkGeneratorWFC : MonoBehaviour
         {
             Vector3Int voxelPosition = voxelsToProcess.Pop();
 
-            // Is this even necessary? I'm not sure...
-            if (!voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].IsDecided() && GetEntropy(voxelPosition) == 1)
+            if (voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].VoxelTypeIndex == -1 && GetEntropy(voxelPosition) == 1)
             {
                 // We have a single chunk type, so we can set it
                 for (int j = voxelCount - 1; j >= 0; j--)
                 {
                     if (!setVoxel && voxelMapArray[voxelPosition.x, voxelPosition.y, voxelPosition.z][j])
                     {
-                        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z] = voxelTypes[j];
-                        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].ToggleDecided();
-                        Debug.Log(voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].name + " has been decided");
+                        voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].VoxelTypeIndex = j;
+                        //Debug.Log(voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].name + " has been decided");
                         setVoxel = true;
-                        //setVoxels.Add(voxelPosition);
                     }
                     voxelMapArray[voxelPosition.x, voxelPosition.y, voxelPosition.z][j] = false;
                 }
             }
 
-            if (voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].IsDecided())
+            if (voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].VoxelTypeIndex != -1)
             {
                 // I've realized that at least in step mode, this will make some voxels not be instantiated
                 //Debug.Log("I have decided on " + voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].name);
@@ -407,35 +402,34 @@ public class ChunkGeneratorWFC : MonoBehaviour
             if (neighborPosition.x >= 0 && neighborPosition.x < dimensions.x && neighborPosition.y >= 0 && neighborPosition.y < dimensions.y && neighborPosition.z >= 0 && neighborPosition.z < dimensions.z)
             {
 
-                if (!voxelMap[neighborPosition.x, neighborPosition.y, neighborPosition.z].IsDecided() && voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z].Count(c => c == true) > 1)
+                if (voxelMap[neighborPosition.x, neighborPosition.y, neighborPosition.z].VoxelTypeIndex == -1 && voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z].Count(c => c == true) > 1)
                 {
                     // See if there is a connection from the current voxel to the neighbor
-                    Voxel v = voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z];
+                    VoxelType v = voxelTypes[voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].VoxelTypeIndex];
                     //Debug.Log(v.name);
-                    bool voxelHasConnection = voxelMap[voxelPosition.x, voxelPosition.y, voxelPosition.z].HasConnection(i);
+                    int originConnection = v.connections[(int)i];
                     bool found = false;
 
                     /*
                     Debug.Log(voxelPosition);
                     Debug.Log(neighborPosition);*/
 
-                    if (voxelHasConnection)
+                    if (originConnection != 0)
                     {
-                        // If there is a connection, the neighbor must have a connection to the current voxel as well
+                        // If there is a connection, the neighbor must have a connection to the current voxel as well, with the same connection ID
                         for (int j = 0; j < voxelCount; j++)
                         {
                             if (voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z][j])
                             {
-                                Voxel voxel = voxelTypes[j];
+                                VoxelType voxel = voxelTypes[j];
 
-                                if ((int)i % 2 == 0 && !voxel.HasConnection(i + 1)) // TODO: Make this utilise id's
+                                int d = (int)i % 2 == 0 ? (int)i + 1 : (int)i - 1; // Get the opposite direction
+
+                                // Remove if there is *NO* connection
+                                if (voxel.connections[d] != originConnection)
                                 {
                                     voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z][j] = false;
                                     found = true;
-                                }
-                                else if ((int)i % 2 == 1 && !voxel.HasConnection(i - 1))
-                                {
-                                    voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z][j] = false;
                                 }
                             }
                         }
@@ -447,14 +441,12 @@ public class ChunkGeneratorWFC : MonoBehaviour
                         {
                             if (voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z][j])
                             {
-                                Voxel voxel = voxelTypes[j];
+                                VoxelType voxel = voxelTypes[j];
 
-                                if ((int)i % 2 == 0 && voxel.HasConnection(i + 1)) // TODO: Make this utilise id's
-                                {
-                                    voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z][j] = false;
-                                    found = true;
-                                }
-                                else if ((int)i % 2 == 1 && voxel.HasConnection(i - 1))
+                                int d = (int)i % 2 == 0 ? (int)i + 1 : (int)i - 1;  // Get the opposite direction
+
+                                // Remove if there IS a connection, no matter the connection ID
+                                if (voxel.connections[d] > 0)
                                 {
                                     voxelMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z][j] = false;
                                     found = true;

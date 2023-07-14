@@ -5,7 +5,7 @@ using UnityEngine;
 public class VoxelGang : MonoBehaviour
 {
 
-    [SerializeField] private List<Voxel> voxelTypes;
+    [SerializeField] private List<VoxelType> voxelTypes;
     [SerializeField] private int voxelSize = 3;
 
     private void Awake()
@@ -24,66 +24,72 @@ public class VoxelGang : MonoBehaviour
         return voxelSize;
     } 
 
-    public List<Voxel> GetVoxelTypes()
+    public List<VoxelType> GetVoxelTypes()
     {
         return voxelTypes;
     }
 
     private void ComputeRotations()
     {
-        List<Voxel> newVoxelTypes = new List<Voxel>();
-        foreach (Voxel voxelType in voxelTypes)
+        List<VoxelType> newVoxelTypes = new List<VoxelType>();
+        foreach (VoxelType voxelType in voxelTypes)
         {
             Symmetry sym = voxelType.symmetry;
 
-            // Hacky implementation for now, if the connections has more than one connection id this will fail
             switch (sym)
             {
                 case Symmetry.L:
                     for (int i = 1; i < 4; i++)
                     {
-                        Voxel voxel = new Voxel(voxelType.x, voxelType.y, voxelType.z, voxelType.voxelObject, voxelType.name + " " + i, voxelType.symmetry, voxelType.connections);
-                        voxel.rotation = Quaternion.Euler(0, 90 * i, 0);
-                        List<Direction> directions = new List<Direction>();
-                        foreach (Connection c in voxel.connections)
+                        VoxelType voxel = new VoxelType(voxelType.x, voxelType.y, voxelType.z, voxelType.voxelObject, voxelType.name + " " + i, voxelType.symmetry, Quaternion.Euler(0, 90 * i, 0), voxelType.connections);
+                        List<int> directions = new List<int>();
+                        for (int j = 0; j < 4; j++)
                         {
-                            directions.Add(c.dir);
+                            if (voxel.connections[j] > 0)
+                            {
+                                directions.Add((int)RotateClockwise((Direction)j, i));
+                                directions.Add(voxel.connections[j]);
+                            }
                         }
-                        Direction d1 = directions[0];
-                        Direction d2 = directions[1];
 
-                        voxel.SwapConnectionsFromTo(directions[0], RotateClockwise(d1, i));
-                        voxel.SwapConnectionsFromTo(directions[1], RotateClockwise(d2, i));
+                        voxel.ClearConnections();
+
+                        for (int j = 0; j < directions.Count; j += 2)
+                        {
+                            voxel.AddConnection((Direction)directions[j], directions[j + 1]);
+                        }
                         newVoxelTypes.Add(voxel);
                     }
                     break;
                 case Symmetry.T:
                     for (int i = 1; i < 4; i++)
                     {
-                        Voxel voxel = new Voxel(voxelType.x, voxelType.y, voxelType.z, voxelType.voxelObject, voxelType.name + " " + i, voxelType.symmetry, voxelType.connections);
-                        voxel.rotation = Quaternion.Euler(0, 90 * i, 0);
-                        Direction direction = voxel.connections[0].dir;
-                        foreach (Connection c in voxel.connections)
+                        VoxelType voxel = new VoxelType(voxelType.x, voxelType.y, voxelType.z, voxelType.voxelObject, voxelType.name + " " + i, voxelType.symmetry, Quaternion.Euler(0, 90 * i, 0), voxelType.connections);
+                        List<int> directions = new List<int>();
+                        for (int j = 0; j < 4; j++)
                         {
-                            if (c.dir != Direction.Up && c.dir != Direction.Down) direction = c.dir;
+                            if (voxel.connections[j] > 0)
+                            {
+                                directions.Add(j);
+                            }
                         }
-                        voxel.SwapConnectionsFromTo(direction, RotateClockwise(direction, i));
+                        voxel.SwapConnectionsFromTo((Direction)directions[0], RotateClockwise((Direction)directions[0], i));
                         newVoxelTypes.Add(voxel);
                     }
                     break;
                 case Symmetry.I:
-                    Voxel my_voxel = new Voxel(voxelType.x, voxelType.y, voxelType.z, voxelType.voxelObject, voxelType.name + " " + 1, voxelType.symmetry, voxelType.connections);
-                    my_voxel.rotation = Quaternion.Euler(0, 90, 0);
-                    List<Direction> dirs = new List<Direction>();
-                    foreach (Connection c in my_voxel.connections)
+                    VoxelType my_voxel = new VoxelType(voxelType.x, voxelType.y, voxelType.z, voxelType.voxelObject, voxelType.name + " " + 1, voxelType.symmetry, Quaternion.Euler(0, 90, 0), voxelType.connections);
+                    List<int> dirs = new List<int>();
+                    for (int j = 0; j < 6; j++)
                     {
-                        dirs.Add(c.dir);
+                        if (my_voxel.connections[j] > 0)
+                        {
+                            dirs.Add(j);
+                        }
                     }
-                    Direction dd1 = dirs[0];
-                    Direction dd2 = dirs[1];
 
-                    my_voxel.SwapConnectionsFromTo(dirs[0], RotateClockwise(dd1, 1));
-                    my_voxel.SwapConnectionsFromTo(dirs[1], RotateClockwise(dd2, 1));
+                    my_voxel.SwapConnectionsFromTo((Direction)dirs[0], RotateClockwise((Direction)dirs[0], 1));
+                    my_voxel.SwapConnectionsFromTo((Direction)dirs[1], RotateClockwise((Direction)dirs[1], 1));
                     newVoxelTypes.Add(my_voxel);
                     break;
                 case Symmetry.D:
