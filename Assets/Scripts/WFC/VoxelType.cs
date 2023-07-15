@@ -7,18 +7,14 @@ using UnityEngine;
 [System.Serializable]
 public class VoxelType
 {
-    public int x, y, z;
     public GameObject voxelObject;
     public string name;
     public Symmetry symmetry;
-    public int[] connections;
+    public int[] connections = { 0, 0, 0, 0, 0, 0 };
     public Quaternion rotation;
 
-    public VoxelType(int x, int y, int z, GameObject voxelObject, string name, Symmetry symmetry, Quaternion rotation, int[] connections)
+    public VoxelType(GameObject voxelObject, string name, Symmetry symmetry, Quaternion rotation, int[] connections)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
         this.rotation = rotation;
         this.voxelObject = voxelObject;
         this.symmetry = symmetry;
@@ -28,11 +24,6 @@ public class VoxelType
         {
             this.connections[i] = connections[i];
         }
-    }
-
-    public Vector3Int GetCoordinate()
-    {
-        return new Vector3Int(x, y, z);
     }
 
     public void ClearConnections()
@@ -85,7 +76,5 @@ public class Voxel
         this.z = z;
         this.voxelTypeIndex = voxelTypeIndex;
     }
-
-
 }
 

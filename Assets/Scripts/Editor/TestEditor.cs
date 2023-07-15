@@ -5,7 +5,7 @@ using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-[CustomEditor(typeof(ChunkGeneratorWFC))]
+[CustomEditor(typeof(WFC))]
 public class TestEditor : Editor
 {
     public override VisualElement CreateInspectorGUI()
@@ -14,11 +14,11 @@ public class TestEditor : Editor
         VisualElement myInspector = new VisualElement();
 
         // Add a simple label
-        myInspector.Add(new Label("Custom Inspector"));
+        myInspector.Add(new Label("Gamers Only >:)"));
         myInspector.Add(new Vector3IntField() { bindingPath = "dimensions" });
-        myInspector.Add(new Button(() => { ((ChunkGeneratorWFC)target).GenerateFull(); }) { text = "Generate Full" });
-        myInspector.Add(new Button(() => { ((ChunkGeneratorWFC)target).TakeStep(); }) { text = "Step" });
-        myInspector.Add(new Button(() => { ((ChunkGeneratorWFC)target).Clear(); }) { text = "Clear" });
+        myInspector.Add(new Button(() => { ((WFC)target).GenerateFull(); }) { text = "Generate Full" });
+        myInspector.Add(new Button(() => { ((WFC)target).TakeStep(); }) { text = "Step" });
+        myInspector.Add(new Button(() => { ((WFC)target).Clear(); }) { text = "Clear" });
 
         // Return the finished inspector UI
         return myInspector;
