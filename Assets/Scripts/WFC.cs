@@ -476,14 +476,12 @@ public class WFC : MonoBehaviour
                 if (tileMap[neighborPosition.x, neighborPosition.y, neighborPosition.z] == -1 && tileMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z].Count(c => c == true) > 1)
                 {
                     // See if there is a connection from the current tile to the neighbor
-                    TileType v = tileTypes[tileMap[tilePosition.x, tilePosition.y, tilePosition.z]];
+                    int tileIndex = tileMap[tilePosition.x, tilePosition.y, tilePosition.z];
+                    TileType tileType = tileTypes[tileIndex];
                     //Debug.Log(v.name);
-                    int originConnection = v.connections[(int)i];
+                    int originConnection = tileType.connections[(int)i];
                     bool found = false;
 
-                    /*
-                    Debug.Log(tilePosition);
-                    Debug.Log(neighborPosition);*/
                     // Remove all possible tiles from neighbor
                     if (originConnection == -1)
                     {
@@ -500,6 +498,12 @@ public class WFC : MonoBehaviour
                     {
                         if (originConnection != 0)
                         {
+                            // If tile is not allowed to repeat, remove it
+                            if (!tileType.CanRepeat)
+                            {
+                                tileMapArray[neighborPosition.x, neighborPosition.y, neighborPosition.z][tileIndex] = false;
+                            }
+
                             // If there is a connection, the neighbor must have a connection to the current tile as well, with the same connection ID
                             for (int j = 0; j < tileCount; j++)
                             {
