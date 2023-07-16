@@ -305,9 +305,11 @@ MonoBehaviour:
       connection: 0
     rotation: {x: 0, y: 0, z: 0, w: 0}
     CanTouchGround: 1
-    CanRepeat: 0
+    CanRepeatH: 0
+    CanRepeatV: 0
     MustStandOn: 0
-    weight: 0
+    MustConnect: 0
+    weight: 0.2
     connections: 
   - tileObject: {fileID: 919132149155446097, guid: bec3fcea20656b24c94120709523a374,
       type: 3}
@@ -315,22 +317,49 @@ MonoBehaviour:
     symmetry: 0
     TileConnections:
     - direction: 0
-      connection: -1
+      connection: 0
     - direction: 1
-      connection: -1
+      connection: 0
     - direction: 2
-      connection: -1
+      connection: 0
     - direction: 3
-      connection: -1
+      connection: 0
     - direction: 4
       connection: 1
     - direction: 5
       connection: 1
     rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
     CanTouchGround: 1
-    CanRepeat: 0
-    MustStandOn: 0
-    weight: 0
+    CanRepeatH: 0
+    CanRepeatV: 1
+    MustStandOn: 1
+    MustConnect: 0
+    weight: 0.2
+    connections: 
+  - tileObject: {fileID: 919132149155446097, guid: bec3fcea20656b24c94120709523a374,
+      type: 3}
+    name: Tower
+    symmetry: 0
+    TileConnections:
+    - direction: 0
+      connection: 0
+    - direction: 1
+      connection: 0
+    - direction: 2
+      connection: 0
+    - direction: 3
+      connection: 0
+    - direction: 4
+      connection: 1
+    - direction: 5
+      connection: 1
+    rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
+    CanTouchGround: 0
+    CanRepeatH: 0
+    CanRepeatV: 0
+    MustStandOn: 1
+    MustConnect: 0
+    weight: 0.2
     connections: 
   - tileObject: {fileID: 919132149155446097, guid: 010f5bdaa374e8a4c84d9f99e7f80327,
       type: 3}
@@ -338,22 +367,24 @@ MonoBehaviour:
     symmetry: 0
     TileConnections:
     - direction: 0
-      connection: -1
+      connection: 0
     - direction: 1
-      connection: -1
+      connection: 0
     - direction: 2
-      connection: -1
+      connection: 0
     - direction: 3
-      connection: -1
+      connection: 0
     - direction: 4
-      connection: -1
+      connection: 0
     - direction: 5
       connection: 1
     rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
     CanTouchGround: 0
-    CanRepeat: 0
+    CanRepeatH: 0
+    CanRepeatV: 0
     MustStandOn: 1
-    weight: 0
+    MustConnect: 0
+    weight: 0.1
     connections: 
   - tileObject: {fileID: 919132149155446097, guid: 3f4804b03084d494c8aed5db3437ef13,
       type: 3}
@@ -374,9 +405,11 @@ MonoBehaviour:
       connection: 1
     rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
     CanTouchGround: 0
-    CanRepeat: 0
+    CanRepeatH: 0
+    CanRepeatV: 0
     MustStandOn: 1
-    weight: 0
+    MustConnect: 0
+    weight: 0.8
     connections: 
   - tileObject: {fileID: 919132149155446097, guid: f735cfd3e0679014dbd9a0ce2885ba4c,
       type: 3}
@@ -397,12 +430,138 @@ MonoBehaviour:
       connection: 2
     rotation: {x: 0.70710677, y: 0, z: 0, w: 0.70710677}
     CanTouchGround: 0
-    CanRepeat: 0
+    CanRepeatH: 0
+    CanRepeatV: 0
     MustStandOn: 1
-    weight: 0
+    MustConnect: 0
+    weight: 0.9
+    connections: 
+  - tileObject: {fileID: 919132149155446097, guid: 8d4d6c74412a11f49ad35c411c949a55,
+      type: 3}
+    name: Bridge_Connector_I
+    symmetry: 2
+    TileConnections:
+    - direction: 0
+      connection: -1
+    - direction: 1
+      connection: -1
+    - direction: 2
+      connection: 4
+    - direction: 3
+      connection: 3
+    - direction: 4
+      connection: -1
+    - direction: 5
+      connection: 0
+    rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
+    CanTouchGround: 0
+    CanRepeatH: 1
+    CanRepeatV: 0
+    MustStandOn: 0
+    MustConnect: 1
+    weight: 0.9
+    connections: 
+  - tileObject: {fileID: 919132149155446097, guid: 8d4d6c74412a11f49ad35c411c949a55,
+      type: 3}
+    name: Bridge_Connector_I
+    symmetry: 2
+    TileConnections:
+    - direction: 0
+      connection: -1
+    - direction: 1
+      connection: -1
+    - direction: 2
+      connection: 3
+    - direction: 3
+      connection: 4
+    - direction: 4
+      connection: -1
+    - direction: 5
+      connection: 0
+    rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
+    CanTouchGround: 0
+    CanRepeatH: 1
+    CanRepeatV: 0
+    MustStandOn: 0
+    MustConnect: 1
+    weight: 0.8
+    connections: 
+  - tileObject: {fileID: 919132149155446097, guid: fa8fc15d74e7c4f44b0740d6f2369967,
+      type: 3}
+    name: Bridge_L
+    symmetry: 1
+    TileConnections:
+    - direction: 0
+      connection: 4
+    - direction: 1
+      connection: -1
+    - direction: 2
+      connection: 4
+    - direction: 3
+      connection: -1
+    - direction: 4
+      connection: -1
+    - direction: 5
+      connection: 0
+    rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
+    CanTouchGround: 0
+    CanRepeatH: 0
+    CanRepeatV: 0
+    MustStandOn: 0
+    MustConnect: 1
+    weight: 0.3
+    connections: 
+  - tileObject: {fileID: 919132149155446097, guid: 8d4d6c74412a11f49ad35c411c949a55,
+      type: 3}
+    name: Bridge
+    symmetry: 2
+    TileConnections:
+    - direction: 0
+      connection: -1
+    - direction: 1
+      connection: -1
+    - direction: 2
+      connection: 4
+    - direction: 3
+      connection: 4
+    - direction: 4
+      connection: -1
+    - direction: 5
+      connection: -1
+    rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
+    CanTouchGround: 0
+    CanRepeatH: 1
+    CanRepeatV: 0
+    MustStandOn: 0
+    MustConnect: 1
+    weight: 0.1
+    connections: 
+  - tileObject: {fileID: 919132149155446097, guid: 17496d260bd2bbc4f893f4913d067f01,
+      type: 3}
+    name: Balcony
+    symmetry: 1
+    TileConnections:
+    - direction: 0
+      connection: -1
+    - direction: 1
+      connection: -1
+    - direction: 2
+      connection: 4
+    - direction: 3
+      connection: -1
+    - direction: 4
+      connection: -1
+    - direction: 5
+      connection: -1
+    rotation: {x: 0.70710677, y: 0, z: 0, w: -0.70710677}
+    CanTouchGround: 0
+    CanRepeatH: 1
+    CanRepeatV: 0
+    MustStandOn: 0
+    MustConnect: 1
+    weight: 0.1
     connections: 
   tileSize: 2
-  ScaleFactor: 1
 --- !u!1 &1350543276
 GameObject:
   m_ObjectHideFlags: 0
@@ -540,4 +699,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee2548876d0c92340967a16ad5344eef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dimensions: {x: 5, y: 5, z: 5}
+  dimensions: {x: 15, y: 15, z: 15}

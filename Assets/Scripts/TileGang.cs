@@ -7,7 +7,6 @@ public class TileGang : MonoBehaviour
 
     [SerializeField] private List<TileType> tileTypes;
     [SerializeField] private int tileSize = 3;
-    public int ScaleFactor = 1;
 
     private void Awake()
     {
@@ -49,7 +48,7 @@ public class TileGang : MonoBehaviour
                     {
                         TileType tile = new TileType(tileType.tileObject, tileType.name + " " + i, tileType.symmetry, 
                             Quaternion.Euler(r.x, r.y + 90 * i, r.z), tileType.connections, tileType.weight,
-                            tileType.CanTouchGround, tileType.CanRepeat, tileType.MustStandOn);
+                            tileType.CanTouchGround, tileType.CanRepeatH, tileType.CanRepeatV, tileType.MustStandOn, tileType.MustConnect);
                         List<int> directions = RotateAll(tile.connections, i);
 
                         tile.ClearConnections();
@@ -66,7 +65,7 @@ public class TileGang : MonoBehaviour
                     {
                         TileType tile = new TileType(tileType.tileObject, tileType.name + " " + i, tileType.symmetry, 
                             Quaternion.Euler(r.x, r.y + 90 * i, r.z), tileType.connections, tileType.weight,
-                            tileType.CanTouchGround, tileType.CanRepeat, tileType.MustStandOn);
+                            tileType.CanTouchGround, tileType.CanRepeatH, tileType.CanRepeatV, tileType.MustStandOn, tileType.MustConnect);
                         List<int> directions = RotateAll(tile.connections, i);
 
                         tile.ClearConnections();
@@ -81,7 +80,7 @@ public class TileGang : MonoBehaviour
                 case Symmetry.I:
                     TileType my_tile = new TileType(tileType.tileObject, tileType.name + " " + 1, tileType.symmetry, 
                         Quaternion.Euler(r.x, r.y + 90, r.z), tileType.connections, tileType.weight,
-                        tileType.CanTouchGround, tileType.CanRepeat, tileType.MustStandOn);
+                        tileType.CanTouchGround, tileType.CanRepeatH, tileType.CanRepeatV, tileType.MustStandOn, tileType.MustConnect);
                     List<int> dirs = RotateAll(my_tile.connections, 1);
 
                     my_tile.ClearConnections();

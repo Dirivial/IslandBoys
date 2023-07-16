@@ -19,15 +19,17 @@ public class TileType
     public List<DirAndCon> TileConnections;
     public Quaternion rotation;
     public bool CanTouchGround = false;
-    public bool CanRepeat = false;
+    public bool CanRepeatH = false;
+    public bool CanRepeatV = false;
     public bool MustStandOn = false;
+    public bool MustConnect = false;
     public float weight = 1.0f;
 
     [HideInInspector] public int[] connections = { 0, 0, 0, 0, 0, 0 };
 
     public TileType(GameObject tileObject, string name, Symmetry symmetry, 
         Quaternion rotation, int[] connections, float weight, 
-        bool CanTouchGround, bool CanRepeat, bool MustStandOn)
+        bool CanTouchGround, bool CanRepeatH, bool CanRepeatV, bool MustStandOn, bool MustConnect)
     {
         this.rotation = rotation;
         this.tileObject = tileObject;
@@ -35,10 +37,11 @@ public class TileType
         this.name = name;
         this.connections = new int[6];
         this.weight = weight;
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 6; i++)
         {
             this.connections[i] = connections[i];
         }
+        this.CanTouchGround = CanTouchGround; this.CanRepeatH = CanRepeatH; this.CanRepeatV = CanRepeatV; this.MustStandOn = MustStandOn; this.MustConnect = MustConnect;
     }
 
     public void UpdateConnections()
@@ -53,12 +56,12 @@ public class TileType
 
     public void ClearConnections()
     {
-        this.connections = new int[5];
+        this.connections = new int[6];
     }
 
     public void SetConnectionsTo(int[] connections)
     {
-        this.connections = new int[5];
+        this.connections = new int[6];
         for (int i = 0;i < connections.Length;i++)
         {
             this.connections[i]= connections[i];
