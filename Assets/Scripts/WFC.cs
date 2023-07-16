@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Debug = UnityEngine.Debug;
+using UnityEngine.Tilemaps;
 
 public enum Direction
 {
@@ -245,7 +246,6 @@ public class WFC : MonoBehaviour
         foreach (TileType tile in tileTypes)
         {
             GameObject obj = Instantiate(tile.tileObject, new Vector3(i * tileSize, 0, 0), tile.rotation);
-            obj.transform.localScale = new Vector3(tileGang.ScaleFactor, tileGang.ScaleFactor, tileGang.ScaleFactor);
             obj.transform.parent = transform;
             i += 1.1f;
         }
@@ -264,7 +264,6 @@ public class WFC : MonoBehaviour
                     {
                         //Debug.Log("Heey " + tileMap[x, y, z].name + " " + x + " " + y + " " + z);
                         GameObject obj = Instantiate(tileTypes[index].tileObject, new Vector3(x * tileSize, y * tileSize, z * tileSize), tileTypes[index].rotation);
-                        obj.transform.localScale = new Vector3(tileGang.ScaleFactor, tileGang.ScaleFactor, tileGang.ScaleFactor);
                         obj.transform.parent = transform;
                         boi.Add(obj);
                     } else
@@ -293,8 +292,8 @@ public class WFC : MonoBehaviour
     // Pick a random tile at the given tile position, using the possible tiles at that position
     private void PickTileAt(Vector3Int pos)
     {
-        TileType v = ChooseTileTypeAt(pos.x, pos.y, pos.z);
-        tileMap[pos.x, pos.y, pos.z] = tileTypes.IndexOf(v);
+        int v = ChooseTileTypeAt(pos.x, pos.y, pos.z);
+        tileMap[pos.x, pos.y, pos.z] = v;
 
         for (int i = 0; i < tileTypes.Count; i++)
         {
@@ -334,21 +333,19 @@ public class WFC : MonoBehaviour
         return lowestEntropyPosition;
     }
 
-    private TileType ChooseTileTypeAt(int x, int y, int z)
+    private int ChooseTileTypeAt(int x, int y, int z)
     {
-        List<TileType> choices = new List<TileType>();
-        List<TileType> withinVolume = new List<TileType>(); // No connections to the outside
-        List<TileType> groundTiles = new List<TileType>(); 
+        List<int> choices = new List<int>();
+        List<int> withinVolume = new List<int>(); // No connections to the outside
         
         if (y == 0)
         {
+            List<int> groundTiles = new List<int>();  // Tiles that can touch ground
             for (int i = 0; i < tileCount; i++)
             {
                 if (tileMapArray[x, y, z][i])
                 {
-                    choices.Add(tileTypes[i]);
-                    if (!ConnectsOutside(x, y, z, i)) withinVolume.Add(tileTypes[i]);
-                    if (tileTypes[i].CanTouchGround) groundTiles.Add(tileTypes[i]);
+                    if (tileTypes[i].CanTouchGround) groundTiles.Add(i);
                 }
             }
             if (groundTiles.Count > 0)
@@ -356,7 +353,8 @@ public class WFC : MonoBehaviour
                 return groundTiles[Random.Range(0, groundTiles.Count)];
             } else
             {
-                Debug.Log("This should force a restart, or just an empty block");
+                Debug.Log("On Ground, but can't find a tile that works. Returning EMPTY");
+                return 0;
             }
         } else
         {
@@ -364,13 +362,11 @@ public class WFC : MonoBehaviour
             {
                 if (tileMapArray[x, y, z][i])
                 {
-                    choices.Add(tileTypes[i]);
-                    if (!ConnectsOutside(x, y, z, i)) withinVolume.Add(tileTypes[i]);
+                    choices.Add(i);
+                    if (!ConnectsOutside(x, y, z, i)) withinVolume.Add(i);
                 }
             }
         }
-
-
 
         // Try to take one from the within volume list first
         if (withinVolume.Count > 0)
@@ -411,7 +407,6 @@ public class WFC : MonoBehaviour
     {
         int maxIterations = 1000;
         int i = 0;
-        bool setTile = false;
         List<Vector3Int> setTiles = new List<Vector3Int>();
         while (tilesToProcess.Count > 0 && maxIterations > i)
         {
@@ -419,15 +414,18 @@ public class WFC : MonoBehaviour
 
             if (tileMap[tilePosition.x, tilePosition.y, tilePosition.z] == -1 && GetEntropy(tilePosition) == 1)
             {
+
+                
+                int chosenTile = ChooseTileTypeAt(tilePosition.x, tilePosition.y, tilePosition.z);
+                
+                if (chosenTile != -1)
+                {
+                    tileMap[tilePosition.x, tilePosition.y, tilePosition.z] = chosenTile;
+                }
+
                 // We have a single chunk type, so we can set it
                 for (int j = tileCount - 1; j >= 0; j--)
                 {
-                    if (!setTile && tileMapArray[tilePosition.x, tilePosition.y, tilePosition.z][j])
-                    {
-                        tileMap[tilePosition.x, tilePosition.y, tilePosition.z] = j;
-                        //Debug.Log(tileMap[tilePosition.x, tilePosition.y, tilePosition.z].name + " has been decided");
-                        setTile = true;
-                    }
                     tileMapArray[tilePosition.x, tilePosition.y, tilePosition.z][j] = false;
                 }
             }
@@ -440,7 +438,6 @@ public class WFC : MonoBehaviour
                 setTiles.Add(tilePosition);
             }
             i++;
-            setTile = false;
         }
         return setTiles;
     }
@@ -554,7 +551,7 @@ public class WFC : MonoBehaviour
         }
     }
 
-    // Get the entropy of a chunk
+    // Get the entropy of a tile - TODO: Update this to support weights
     private int GetEntropy(Vector3Int chunkPosition)
     {
         return tileMapArray[chunkPosition.x, chunkPosition.y, chunkPosition.z].Count(c => c == true);
